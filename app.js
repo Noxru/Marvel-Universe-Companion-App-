@@ -1152,5 +1152,20 @@ console.log('MARVEL MARATHON initialized.');
   render();
   console.log('Doomsday Prep added.');
 })();
+/* Keep Doomsday Prep visible in mobile navigation */
+(() => {
+  const topNav = document.querySelector('nav.tabs');
+  const bottomNav = document.querySelector('footer.bottom');
 
+  const topButton = document.querySelector('nav.tabs [data-doomsday-tab]');
+  const bottomButton = document.querySelector('footer.bottom [data-doomsday-tab]');
+
+  if (topNav && topButton) {
+    topNav.insertBefore(topButton, topNav.querySelector('[data-view="universes"]'));
+  }
+
+  if (bottomNav && bottomButton) {
+    bottomNav.insertBefore(bottomButton, bottomNav.querySelector('[data-view="universes"]'));
+  }
+})();
 

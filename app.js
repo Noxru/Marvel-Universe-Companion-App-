@@ -205,6 +205,11 @@ function addProfileImage(container, name, alt) {
       image.src = source;
     } else {
       image.remove();
+        }
+  });
+}
+
+  }   
   let watched = new Set();
 
   try {
@@ -500,11 +505,7 @@ function addProfileImage(container, name, alt) {
     });
 
 
-    }
-  });
-}
-
-  }   // CHARACTER PROFILES
+   // CHARACTER PROFILES
   
 function renderCharacters() {
   if (!$("characterItems")) return;

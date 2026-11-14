@@ -457,78 +457,139 @@
     list.forEach(item => {
       $("watchItems").append(makeItem(item, true));
     });
-  }   // CHARACTER PROFILES
-  function renderCharacters() {
-    if (!$("characterItems")) return;
 
-    const query =
-      ($("characterSearch")?.value || "").toLowerCase().trim();
+// CHARACTER IMAGE LOADER
+const characterImageCache = new Map();
 
-    const universe =
-      $("characterUniverse")?.value || "all";
-
-    const list = characters.filter(character => {
-      const matchesUniverse =
-        universe === "all" || character[3] === universe;
-
-      const matchesSearch =
-        !query || character.join(" ").toLowerCase().includes(query);
-
-      return matchesUniverse && matchesSearch;
-    });
-
-    if ($("characterCount")) {
-      $("characterCount").textContent =
-        `${list.length} characters`;
-    }
-
-    $("characterItems").replaceChildren();
-
-    list.forEach(character => {
-      const card = document.createElement("article");
-      card.className = "character-card";
-      card.style.cursor = "pointer";
-
-      const heading = document.createElement("h3");
-      heading.textContent = character[0];
-
-      const alias = document.createElement("span");
-      alias.className = "chip";
-      alias.textContent = character[1];
-
-      const description = document.createElement("p");
-      description.textContent = character[2];
-
-      const universeText = document.createElement("p");
-      universeText.textContent = "Universe: " + character[3];
-
-      const more = document.createElement("p");
-      more.textContent = "Tap to view full profile →";
-
-      heading.append(alias);
-      card.append(heading, description, universeText, more);
-
-      card.addEventListener("click", () => {
-        showDetail(
-          character[1],
-          character[2],
-          [
-            ["Real name", character[0]],
-            ["Superhero name", character[1]],
-            ["Universe", character[3]],
-            ["Powers and abilities", character[4]],
-            ["Affiliations", character[5]],
-            ["Allies", character[6]],
-            ["Enemies", character[7]],
-            ["Screen appearances", character[8]]
-          ]
-        );
-      });
-
-      $("characterItems").append(card);
-    });
+async function getCharacterImage(name) {
+  if (characterImageCache.has(name)) {
+    return characterImageCache.get(name);
   }
 
+  const request = fetch(
+    "https://en.wikipedia.org/api/rest_v1/page/summary/" +
+    encodeURIComponent(name.replaceAll(" ", "_"))
+  )
+    .then(response => {
+      if (!response.ok) return null;
+      return response.json();
+    })
+    .then(data => data.thumbnail?.source || null)
+    .catch(() => null);
+
+  characterImageCache.set(name, request);
+  return request;
+}
+
+function addProfileImage(container, name, alt) {
+  const image = document.createElement("img");
+
+  image.alt = alt;
+  image.loading = "lazy";
+  image.style.width = "100%";
+  image.style.maxHeight = "260px";
+  image.style.objectFit = "contain";
+  image.style.borderRadius = "14px";
+  image.style.marginBottom = "15px";
+
+  container.prepend(image);
+
+  getCharacterImage(name).then(source => {
+    if (source) {
+      image.src = source;
+    } else {
+      image.remove();
+    }
+  });
+}
+
+  }   // CHARACTER PROFILES
+  
+function renderCharacters() {
+  if (!$("characterItems")) return;
+
+  const query =
+    ($("characterSearch")?.value || "").toLowerCase().trim();
+
+  const universe =
+    $("characterUniverse")?.value || "all";
+
+  const list = characters.filter(character => {
+    const matchesUniverse =
+      universe === "all" || character[3] === universe;
+
+    const matchesSearch =
+      !query || character.join(" ").toLowerCase().includes(query);
+
+    return matchesUniverse && matchesSearch;
+  });
+
+  if ($("characterCount")) {
+    $("characterCount").textContent =
+      `${list.length} characters`;
+  }
+
+  $("characterItems").replaceChildren();
+
+  list.forEach(character => {
+    const card = document.createElement("article");
+    card.className = "character-card";
+    card.style.cursor = "pointer";
+
+    const image = document.createElement("img");
+    image.alt = character[1];
+    image.loading = "lazy";
+    image.style.width = "100%";
+    image.style.height = "220px";
+    image.style.objectFit = "contain";
+    image.style.borderRadius = "12px";
+
+    card.append(image);
+
+    getCharacterImage(character[1]).then(source => {
+      if (source) image.src = source;
+      else image.alt = "Image unavailable for " + character[1];
+    });
+
+    const heading = document.createElement("h3");
+    heading.textContent = character[0];
+
+    const alias = document.createElement("span");
+    alias.className = "chip";
+    alias.textContent = character[1];
+
+    const description = document.createElement("p");
+    description.textContent = character[2];
+
+    const universeText = document.createElement("p");
+    universeText.textContent = "Universe: " + character[3];
+
+    const more = document.createElement("p");
+    more.textContent = "Tap to view full profile →";
+
+    heading.append(alias);
+    card.append(heading, description, universeText, more);
+
+    card.addEventListener("click", () => {
+      showDetail(
+        character[1],
+        character[2],
+        [
+          ["Real name", character[0]],
+          ["Superhero name", character[1]],
+          ["Universe", character[3]],
+          ["Powers and abilities", character[4]],
+          ["Affiliations", character[5]],
+          ["Allies", character[6]],
+          ["Enemies", character[7]],
+          ["Screen appearances", character[8]]
+        ]
+      );
+    });
+
+    $("characterItems").append(card);
+  });
+}
   // TEAM PROFILES
   function renderTeams() {
     if (!$("teamItems")) return;

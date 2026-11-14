@@ -1086,3 +1086,48 @@ console.log('MARVEL MARATHON initialized.');
   );
 })();
 
+
+/* ==========================================
+   FANTASTIC FOUR MOVIE COLLECTION
+   ========================================== */
+
+titles.push(
+  [
+    'fantastic-four-2005',
+    'Fantastic Four',
+    'Movie',
+    'Fantastic Four',
+    2005, 2005, 0,
+    'Reed Richards and his team gain extraordinary powers.',
+    'Starring Ioan Gruffudd, Jessica Alba, Chris Evans and Michael Chiklis'
+  ],
+  [
+    'fantastic-four-2007',
+    'Fantastic Four: Rise of the Silver Surfer',
+    'Movie',
+    'Fantastic Four',
+    2007, 2007, 0,
+    'The Fantastic Four face the Silver Surfer.',
+    ''
+  ],
+  [
+    'fantastic-four-2015',
+    'Fantastic Four',
+    'Movie',
+    'Fantastic Four',
+    2015, 2015, 0,
+    'A new team discovers extraordinary abilities.',
+    ''
+  ],
+  [
+    'fantastic-four-first-collection',
+    'The Fantastic Four: First Steps',
+    'Movie',
+    'Fantastic Four',
+    1960, 2025, 1,
+    'Marvel’s First Family enters the multiverse.',
+    'Also listed in the MCU collection'
+  ]
+);
+
+

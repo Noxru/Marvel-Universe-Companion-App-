@@ -1,3 +1,4 @@
+
 /* ==========================================================
    MARVEL MARATHON — COMPLETE APP REPLACEMENT
    Version: November 2026
@@ -1084,5 +1085,4 @@ console.log('MARVEL MARATHON initialized.');
     { childList: true, subtree: true }
   );
 })();
-
 

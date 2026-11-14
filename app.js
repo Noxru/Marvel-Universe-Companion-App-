@@ -1263,56 +1263,145 @@ console.log('MARVEL MARATHON initialized.');
   async function addPictures(card) {
     const heading = card.querySelector("h3");
     const slot = card.querySelector(".image-slot");
-    if (!heading || !slot || slot.dataset.upgraded) return;
 
-    const names = characterImages[heading.textContent.trim()];
-    if (!names) return;
 
-    slot.dataset.upgraded = "true";
+/* ======================================================
+   CHARACTER IMAGES — ACTORS + COMIC ARTWORK
+   ====================================================== */
+(() => {
+  const imageNames = {
+    "Iron Man": ["Robert Downey Jr portrait", "Iron Man Marvel comic cover"],
+    "Captain America": ["Chris Evans portrait", "Captain America Marvel comic cover"],
+    "Thor": ["Chris Hemsworth portrait", "Thor Marvel comic cover"],
+    "Hulk": ["Mark Ruffalo portrait", "Hulk Marvel comic cover"],
+    "Black Widow": ["Scarlett Johansson portrait", "Black Widow Marvel comic cover"],
+    "Hawkeye": ["Jeremy Renner portrait", "Hawkeye Marvel comic cover"],
+    "Spider-Man": ["Tom Holland portrait", "Spider-Man Marvel comic cover"],
+    "Doctor Strange": ["Benedict Cumberbatch portrait", "Doctor Strange Marvel comic cover"],
+    "Black Panther": ["Chadwick Boseman portrait", "Black Panther Marvel comic cover"],
+    "Captain Marvel": ["Brie Larson portrait", "Captain Marvel Marvel comic cover"],
+    "Scarlet Witch": ["Elizabeth Olsen portrait", "Scarlet Witch Marvel comic cover"],
+    "Loki": ["Tom Hiddleston portrait", "Loki Marvel comic cover"],
+    "Deadpool": ["Ryan Reynolds portrait", "Deadpool Marvel comic cover"],
+    "Wolverine": ["Hugh Jackman portrait", "Wolverine Marvel comic cover"],
+    "Professor X": ["Patrick Stewart portrait", "Professor X Marvel comic cover"],
+    "Magneto": ["Ian McKellen portrait", "Magneto Marvel comic cover"],
+    "Phoenix": ["Sophie Turner portrait", "Jean Grey Phoenix Marvel comic cover"],
+    "Miles Morales": ["Shameik Moore portrait", "Miles Morales Marvel comic cover"],
+    "Venom": ["Tom Hardy portrait", "Venom Marvel comic cover"],
+    "Mister Fantastic": ["Pedro Pascal portrait", "Mister Fantastic Marvel comic cover"],
+    "Invisible Woman": ["Vanessa Kirby portrait", "Invisible Woman Marvel comic cover"],
+    "Human Torch": ["Joseph Quinn portrait", "Human Torch Marvel comic cover"],
+    "The Thing": ["Ebon Moss-Bachrach portrait", "The Thing Marvel comic cover"],
+    "Daredevil": ["Charlie Cox portrait", "Daredevil Marvel comic cover"],
+    "The Punisher": ["Jon Bernthal portrait", "Punisher Marvel comic cover"],
+    "Jessica Jones": ["Krysten Ritter portrait", "Jessica Jones Marvel comic cover"],
+    "Luke Cage": ["Mike Colter portrait", "Luke Cage Marvel comic cover"],
+    "Ms. Marvel": ["Iman Vellani portrait", "Ms Marvel Kamala Khan comic cover"],
+    "Yelena Belova": ["Florence Pugh portrait", "Yelena Belova Marvel comic cover"]
+  };
+
+  const cache = new Map();
+
+  async function findImage(search) {
+    if (cache.has(search)) return cache.get(search);
+
+    try {
+      const params = new URLSearchParams({
+        action: "query",
+        generator: "search",
+        gsrsearch: "filetype:bitmap " + search,
+        gsrnamespace: "6",
+        gsrlimit: "1",
+        prop: "imageinfo",
+        iiprop: "url",
+        iiurlwidth: "600",
+        format: "json",
+        origin: "*"
+      });
+
+      const response = await fetch(
+        "https://commons.wikimedia.org/w/api.php?" + params
+      );
+
+      if (!response.ok) throw new Error("Image search failed");
+
+      const data = await response.json();
+      const pages = Object.values(data.query?.pages || {});
+      const url = pages[0]?.imageinfo?.[0]?.thumburl ||
+                  pages[0]?.imageinfo?.[0]?.url || "";
+
+      cache.set(search, url);
+      return url;
+    } catch (error) {
+      console.error("Character image error:", search, error);
+      return "";
+    }
+  }
+
+  async function addImages(card) {
+    const heading = card.querySelector("h3");
+    const slot = card.querySelector(".image-slot");
+
+    if (!heading || !slot || slot.dataset.imageUpgrade === "done") return;
+
+    const searches = imageNames[heading.textContent.trim()];
+    if (!searches) return;
+
+    slot.dataset.imageUpgrade = "done";
     slot.innerHTML = "";
 
-    const labels = ["MCU ACTOR", "COMIC ARTWORK"];
-
-    for (let i = 0; i < names.length; i++) {
+    for (let i = 0; i < searches.length; i++) {
       const figure = document.createElement("figure");
-      figure.style.cssText = "margin:10px 0;";
+      figure.style.cssText = "margin:14px 0;";
 
       const caption = document.createElement("figcaption");
-      caption.textContent = labels[i];
+      caption.textContent = i === 0 ? "MCU ACTOR" : "COMIC ARTWORK";
       caption.style.cssText =
-        "font-weight:bold;font-size:12px;color:#9db8ff;margin-bottom:6px;";
+        "font-weight:bold;color:#9db8ff;font-size:13px;margin-bottom:8px;";
 
-      const img = document.createElement("img");
-      img.alt = heading.textContent + " - " + labels[i];
-      img.loading = "lazy";
-      img.style.cssText =
-        "width:100%;max-height:240px;object-fit:contain;" +
+      const image = document.createElement("img");
+      image.alt = heading.textContent + " — " + caption.textContent;
+      image.loading = "lazy";
+      image.style.cssText =
+        "display:block;width:100%;max-height:260px;object-fit:contain;" +
         "border-radius:12px;background:#1b2738;";
 
-      figure.append(caption, img);
+      figure.append(caption, image);
       slot.appendChild(figure);
 
-      const url = await getPicture(names[i]);
+      const url = await findImage(searches[i]);
+
       if (url) {
-        img.src = url;
+        image.src = url;
+        image.onerror = () => {
+          image.remove();
+          caption.textContent += " — unavailable";
+        };
       } else {
-        caption.textContent += " — image unavailable";
+        caption.textContent += " — unavailable";
       }
     }
   }
 
-  function upgradeCharacters() {
+  function scanCharacters() {
     document.querySelectorAll("#characterItems .character-card")
-      .forEach(addPictures);
+      .forEach(card => addImages(card));
   }
 
-  upgradeCharacters();
+  scanCharacters();
 
-  new MutationObserver(upgradeCharacters).observe(
-    document.getElementById("characterItems") || document.body,
-    { childList: true, subtree: true }
-  );
+  const container = document.getElementById("characterItems");
+  if (container) {
+    new MutationObserver(scanCharacters).observe(container, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  console.log("Character image upgrade loaded.");
 })();
+
 
 
 

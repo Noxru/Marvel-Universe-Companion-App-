@@ -1183,32 +1183,27 @@ console.log('MARVEL MARATHON initialized.');
   addButton(topNav, true);
   addButton(bottomNav, false);
 })();
-
-
-/* BIGGER MOBILE BOTTOM NAVIGATION */
+* EXTRA LARGE BOTTOM NAVIGATION */
 (() => {
   const style = document.createElement('style');
-
   style.textContent = `
-    footer.bottom {
-      justify-content: flex-start !important;
-      gap: 8px !important;
-      padding: 12px 12px calc(12px + env(safe-area-inset-bottom)) !important;
-      overflow-x: auto !important;
-      -webkit-overflow-scrolling: touch;
+    footer.bottom button {
+      font-size: 18px !important;
+      padding: 18px 20px !important;
+      min-height: 60px !important;
+      font-weight: 700 !important;
     }
 
-    footer.bottom button {
-      font-size: 14px !important;
-      padding: 13px 15px !important;
-      min-height: 48px !important;
-      border-radius: 12px !important;
-      flex-shrink: 0;
+    footer.bottom {
+      gap: 12px !important;
+      padding: 15px 12px calc(15px + env(safe-area-inset-bottom)) !important;
     }
   `;
-
   document.head.appendChild(style);
 })();
+
+
+
 
 
 

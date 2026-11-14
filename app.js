@@ -1,5 +1,3 @@
-
-
 /* ==========================================================
    MARVEL MARATHON — COMPLETE APP REPLACEMENT
    Version: November 2026

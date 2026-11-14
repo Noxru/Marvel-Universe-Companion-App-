@@ -10,9 +10,22 @@ const $ = id => document.getElementById(id);
 const KEY = 'marvelMarathonCompanionProgress';
 
 const universes = [
-  'MCU', 'X-Men', 'Deadpool', 'Fantastic Four',
-  'Sony Spider-Man', 'Animated Marvel', 'Other Marvel'
+  'MCU',
+  'X-Men',
+  'Deadpool',
+  'Fantastic Four',
+  'Sony Spider-Man',
+  'Animated Marvel',
+  'Other Marvel'
 ];
+
+/* ----------------------------------------------------------
+   RELEASED MARVEL SCREEN PRODUCTIONS
+
+   Format:
+   [id, title, format, universe, storyYear, releaseYear,
+    essential, description, extra]
+   ---------------------------------------------------------- */
 
 const titles = [
 ['captain-america-1944','Captain America','Serial','Other Marvel',1944,1944,0,'The original live-action Captain America serial.','15 chapters'],
@@ -52,6 +65,8 @@ const titles = [
 ['spider-verse','Spider-Man: Into the Spider-Verse','Animated Movie','Sony Spider-Man',2018,2018,0,'Miles Morales discovers the multiverse.',''],
 ['spider-verse-2','Spider-Man: Across the Spider-Verse','Animated Movie','Sony Spider-Man',2023,2023,0,'Miles meets the Spider Society.',''],
 
+/* MCU FEATURE FILMS */
+
 ['iron-man','Iron Man','Movie','MCU',2008,2008,1,'Tony Stark builds the first Iron Man suit.',''],
 ['hulk','The Incredible Hulk','Movie','MCU',2010,2008,0,'Bruce Banner searches for a cure.',''],
 ['iron-man-2','Iron Man 2','Movie','MCU',2010,2010,1,'Tony faces new enemies.',''],
@@ -89,6 +104,8 @@ const titles = [
 ['fantastic-four-first','The Fantastic Four: First Steps','Movie','MCU',1960,2025,1,'Marvel’s First Family enters the multiverse.',''],
 ['spider-brand-new-day','Spider-Man: Brand New Day','Movie','MCU',2026,2026,1,'Peter Parker returns.','Released July 31, 2026'],
 
+/* MCU SERIES AND SPECIALS */
+
 ['agent-carter-short','Agent Carter (One-Shot)','Short','MCU',1946,2013,0,'Peggy Carter takes on a covert mission.',''],
 ['agent-carter-s1','Agent Carter — Season 1','Series','MCU',1946,2015,0,'Peggy Carter works for the SSR.','8 episodes'],
 ['agent-carter-s2','Agent Carter — Season 2','Series','MCU',1947,2016,0,'Peggy investigates a new threat in Los Angeles.','10 episodes · cancelled'],
@@ -125,6 +142,8 @@ const titles = [
 ['one-shot-item47','Item 47','Short','MCU',2012,2012,0,'A couple find alien technology.',''],
 ['one-shot-agent','Agent Carter','Short','MCU',1946,2013,0,'Peggy Carter takes on a mission.',''],
 ['one-shot-allhail','All Hail the King','Short','MCU',2014,2014,0,'Trevor Slattery faces the consequences.',''],
+
+/* X-MEN, SPIDER-MAN AND OTHER ANIMATION */
 
 ['xmen-animated','X-Men: The Animated Series','Animated Series','X-Men',1992,1992,0,'The classic animated X-Men series.','5 seasons'],
 ['xmen-97','X-Men ’97 — Season 1','Animated Series','X-Men',1997,2024,0,'The X-Men continue their animated adventures.','10 episodes'],
@@ -167,6 +186,11 @@ const titles = [
 ['gifted','The Gifted','Series','X-Men',2017,2017,0,'Mutants fight for survival.','2 seasons']
 ];
 
+/* ----------------------------------------------------------
+   UPCOMING MCU
+   Released titles are not shown here.
+   ---------------------------------------------------------- */
+
 const upcoming = [
 ['Avengers: Doomsday','Movie','17 December 2026 — Australia','Officially dated'],
 ['Avengers: Secret Wars','Movie','17 December 2027','Officially dated'],
@@ -183,6 +207,13 @@ const upcoming = [
 ['Armor Wars','Movie','TBA','In development'],
 ['Deadpool 4','Movie','TBA','Reported / unconfirmed']
 ];
+
+/* ----------------------------------------------------------
+   CANCELLED AND ABANDONED PROJECTS
+   Unreleased projects remain separate from the released
+   catalog. Status descriptions distinguish cancellation
+   from development changes and abandoned proposals.
+   ---------------------------------------------------------- */
 
 const cancelled = [
 ['Marvel’s Most Wanted','Series','Cancelled','Agents of S.H.I.E.L.D. spin-off starring Bobbi Morse and Lance Hunter.'],
@@ -397,6 +428,7 @@ document.addEventListener('click',event=>{
 
   const id=button.dataset.extraView;
   setView(id);
+  renderExtraTab(id);
 });
 
 /* ----------------------------------------------------------
@@ -909,165 +941,6 @@ console.log('MARVEL MARATHON initialized.');
 
 })();
 
-  let watched = [];
-
-  try {
-    watched = JSON.parse(localStorage.getItem(DOOMSDAY_KEY) || '[]');
-    if (!Array.isArray(watched)) watched = [];
-  } catch {
-    watched = [];
-  }
-
-  const nav = document.querySelector('nav.tabs');
-  const bottom = document.querySelector('footer.bottom');
-  const main = document.querySelector('main');
-
-  if (!nav || !bottom || !main) return;
-
-  if (!document.getElementById('doomsday-prep')) {
-    const topButton = document.createElement('button');
-    topButton.className = 'tab';
-    topButton.dataset.doomsdayTab = 'true';
-    topButton.textContent = 'Doomsday Prep';
-    nav.appendChild(topButton);
-
-    const bottomButton = document.createElement('button');
-    bottomButton.dataset.doomsdayTab = 'true';
-    bottomButton.textContent = 'Doomsday Prep';
-    bottom.appendChild(bottomButton);
-
-    const section = document.createElement('section');
-    section.id = 'doomsday-prep';
-    section.className = 'view';
-
-    section.innerHTML = `
-      <div class="section-title">
-        <h2>DOOMSDAY PREP</h2>
-        <span class="muted">Your road to Avengers: Doomsday</span>
-      </div>
-
-      <div class="card" style="margin-bottom:18px">
-        <h3 id="doomsday-progress">0% complete</h3>
-        <div style="height:12px;background:#263247;border-radius:20px;overflow:hidden">
-          <div id="doomsday-bar" style="height:100%;width:0%;background:#8b5cf6;transition:width .2s"></div>
-        </div>
-        <p id="doomsday-count" class="muted">0 of 0 watched</p>
-      </div>
-
-      <p class="note">
-        A curated fan-made viewing guide. Essential means most useful
-        for following the story, not an officially confirmed requirement.
-      </p>
-
-      <div id="doomsday-items"></div>
-
-      <button class="btn" id="doomsday-reset" style="margin-top:16px">
-        Reset Doomsday progress
-      </button>
-    `;
-
-    main.appendChild(section);
-  }
-
-  function render() {
-    const container = document.getElementById('doomsday-items');
-    if (!container) return;
-
-    const groups = ['Essential','Recommended','Optional'];
-
-    container.innerHTML = groups.map(group => {
-      const entries = prepList.filter(item => item.group === group);
-      const completed = entries.filter(item => watched.includes(item.id)).length;
-
-      return `
-        <div style="margin:24px 0">
-          <div class="section-title">
-            <h2>${group}</h2>
-            <span class="muted">${completed}/${entries.length}</span>
-          </div>
-
-          ${entries.map(item => `
-            <label class="item" style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;cursor:pointer">
-              <input
-                type="checkbox"
-                data-doomsday-check="${item.id}"
-                ${watched.includes(item.id) ? 'checked' : ''}
-                style="width:20px;height:20px;accent-color:#8b5cf6;flex-shrink:0"
-              >
-              <span class="item-main">
-                <strong>${item.title}</strong>
-                <span class="item-note" style="display:block">${item.note}</span>
-              </span>
-            </label>
-          `).join('')}
-        </div>
-      `;
-    }).join('');
-
-    const completed = prepList.filter(item => watched.includes(item.id)).length;
-    const percentage = Math.round(completed / prepList.length * 100);
-
-    document.getElementById('doomsday-progress').textContent =
-      percentage + '% complete';
-
-    document.getElementById('doomsday-count').textContent =
-      completed + ' of ' + prepList.length + ' watched';
-
-    document.getElementById('doomsday-bar').style.width =
-      percentage + '%';
-  }
-
-  function showTab() {
-    document.querySelectorAll('.view').forEach(view => {
-      view.classList.toggle('active', view.id === 'doomsday-prep');
-    });
-
-    document.querySelectorAll('[data-view]').forEach(button => {
-      button.classList.remove('active');
-    });
-
-    document.querySelectorAll('[data-extra-view]').forEach(button => {
-      button.classList.remove('active');
-    });
-
-    document.querySelectorAll('[data-doomsday-tab]').forEach(button => {
-      button.classList.add('active');
-    });
-
-    window.scrollTo({top:0,behavior:'smooth'});
-    render();
-  }
-
-  document.addEventListener('click', event => {
-    if (event.target.closest('[data-doomsday-tab]')) {
-      showTab();
-    }
-
-    if (event.target.closest('#doomsday-reset')) {
-      if (!confirm('Reset your Doomsday viewing progress?')) return;
-      watched = [];
-      localStorage.setItem(DOOMSDAY_KEY, JSON.stringify(watched));
-      render();
-    }
-  });
-
-  document.addEventListener('change', event => {
-    const checkbox = event.target.closest('[data-doomsday-check]');
-    if (!checkbox) return;
-
-    const id = checkbox.dataset.doomsdayCheck;
-
-    watched = checkbox.checked
-      ? [...new Set([...watched,id])]
-      : watched.filter(item => item !== id);
-
-    localStorage.setItem(DOOMSDAY_KEY, JSON.stringify(watched));
-    render();
-  });
-
-  render();
-  console.log('Doomsday Prep added.');
-})();
 
 /* DOOMSDAY PREP — FORCE NAVIGATION BUTTONS */
 (() => {
@@ -1100,188 +973,116 @@ console.log('MARVEL MARATHON initialized.');
   addButton(bottomNav, false);
 })();
 
-/* EXTRA LARGE BOTTOM NAVIGATION */
-(() => {
-  const style = document.createElement('style');
-  style.textContent = `
-    footer.bottom button {
-      font-size: 18px !important;
-      padding: 18px 20px !important;
-      min-height: 60px !important;
-      font-weight: 700 !important;
-    }
-
-    footer.bottom {
-      gap: 12px !important;
-      padding: 15px 12px calc(15px + env(safe-area-inset-bottom)) !important;
-    }
-  `;
-  document.head.appendChild(style);
-})();
-
 /* ======================================================
-   CHARACTER IMAGES — ACTORS + COMIC ARTWORK
+   CHARACTER IMAGE UPGRADE — MCU ACTORS + COMIC ART
    ====================================================== */
 (() => {
-  const imageNames = {
-    "Iron Man": ["Robert Downey Jr portrait", "Iron Man Marvel comic cover"],
+  const characterImages = {
+    "Iron Man": ["Robert Downey Jr.", "Iron Man (character)"],
     "Captain America": ["Chris Evans (actor)", "Captain America"],
-    "Thor": ["Chris Hemsworth portrait", "Thor Marvel comic cover"],
-    "Hulk": ["Mark Ruffalo portrait", "Hulk Marvel comic cover"],
-    "Black Widow": ["Scarlett Johansson portrait", "Black Widow Marvel comic cover"],
-    "Hawkeye": ["Jeremy Renner portrait", "Hawkeye Marvel comic cover"],
-    "Spider-Man": ["Tom Holland portrait", "Spider-Man Marvel comic cover"],
-    "Doctor Strange": ["Benedict Cumberbatch portrait", "Doctor Strange Marvel comic cover"],
-    "Black Panther": ["Chadwick Boseman portrait", "Black Panther Marvel comic cover"],
-    "Captain Marvel": ["Brie Larson portrait", "Captain Marvel Marvel comic cover"],
-    "Scarlet Witch": ["Elizabeth Olsen portrait", "Scarlet Witch Marvel comic cover"],
-    "Loki": ["Tom Hiddleston portrait", "Loki Marvel comic cover"],
-    "Deadpool": ["Ryan Reynolds portrait", "Deadpool Marvel comic cover"],
-    "Wolverine": ["Hugh Jackman portrait", "Wolverine Marvel comic cover"],
-    "Professor X": ["Patrick Stewart portrait", "Professor X Marvel comic cover"],
-    "Magneto": ["Ian McKellen portrait", "Magneto Marvel comic cover"],
-    "Phoenix": ["Sophie Turner portrait", "Jean Grey Phoenix Marvel comic cover"],
-    "Miles Morales": ["Shameik Moore portrait", "Miles Morales Marvel comic cover"],
-    "Venom": ["Tom Hardy portrait", "Venom Marvel comic cover"],
-    "Mister Fantastic": ["Pedro Pascal portrait", "Mister Fantastic Marvel comic cover"],
-    "Invisible Woman": ["Vanessa Kirby portrait", "Invisible Woman Marvel comic cover"],
-    "Human Torch": ["Joseph Quinn portrait", "Human Torch Marvel comic cover"],
-    "The Thing": ["Ebon Moss-Bachrach portrait", "The Thing Marvel comic cover"],
-    "Daredevil": ["Charlie Cox portrait", "Daredevil Marvel comic cover"],
-    "The Punisher": ["Jon Bernthal portrait", "Punisher Marvel comic cover"],
-    "Jessica Jones": ["Krysten Ritter portrait", "Jessica Jones Marvel comic cover"],
-    "Luke Cage": ["Mike Colter portrait", "Luke Cage Marvel comic cover"],
-    "Ms. Marvel": ["Iman Vellani portrait", "Ms Marvel Kamala Khan comic cover"],
-    "Yelena Belova": ["Florence Pugh portrait", "Yelena Belova Marvel comic cover"]
+    "Thor": ["Chris Hemsworth", "Thor (Marvel Comics)"],
+    "Hulk": ["Mark Ruffalo", "Hulk (comics)"],
+    "Black Widow": ["Scarlett Johansson", "Black Widow (Natasha Romanova)"],
+    "Hawkeye": ["Jeremy Renner", "Hawkeye (Clint Barton)"],
+    "Spider-Man": ["Tom Holland (actor)", "Spider-Man"],
+    "Doctor Strange": ["Benedict Cumberbatch", "Doctor Strange"],
+    "Black Panther": ["Chadwick Boseman", "Black Panther (character)"],
+    "Captain Marvel": ["Brie Larson", "Captain Marvel (Carol Danvers)"],
+    "Scarlet Witch": ["Elizabeth Olsen", "Scarlet Witch"],
+    "Loki": ["Tom Hiddleston", "Loki (Marvel Comics)"],
+    "Deadpool": ["Ryan Reynolds", "Deadpool"],
+    "Wolverine": ["Hugh Jackman", "Wolverine (character)"],
+    "Professor X": ["Patrick Stewart", "Professor X"],
+    "Magneto": ["Ian McKellen", "Magneto (Marvel Comics)"],
+    "Phoenix": ["Sophie Turner", "Jean Grey"],
+    "Miles Morales": ["Shameik Moore", "Miles Morales"],
+    "Venom": ["Tom Hardy", "Venom (character)"],
+    "Mister Fantastic": ["Pedro Pascal", "Mister Fantastic"],
+    "Invisible Woman": ["Vanessa Kirby", "Invisible Woman"],
+    "Human Torch": ["Joseph Quinn (actor)", "Human Torch"],
+    "The Thing": ["Ebon Moss-Bachrach", "Thing (comics)"],
+    "Daredevil": ["Charlie Cox (actor)", "Daredevil"],
+    "The Punisher": ["Jon Bernthal", "Punisher"],
+    "Jessica Jones": ["Krysten Ritter", "Jessica Jones"],
+    "Luke Cage": ["Mike Colter", "Luke Cage"],
+    "Ms. Marvel": ["Iman Vellani", "Kamala Khan"],
+    "Yelena Belova": ["Florence Pugh", "Yelena Belova"]
   };
 
-  const cache = new Map();
+  const imageCache = new Map();
 
-  async function findImage(search) {
-    if (cache.has(search)) return cache.get(search);
+  async function getPicture(page) {
+    if (imageCache.has(page)) return imageCache.get(page);
 
     try {
-      const params = new URLSearchParams({
-        action: "query",
-        list: "search",
-        srsearch: search,
-        srnamespace: "6",
-        srlimit: "8",
-        format: "json",
-        formatversion: "2",
-        origin: "*"
-      });
-
       const response = await fetch(
-        "https://commons.wikimedia.org/w/api.php?" + params
+        "https://en.wikipedia.org/api/rest_v1/page/summary/" +
+        encodeURIComponent(page.replaceAll(" ", "_"))
       );
 
-      if (!response.ok) throw new Error("Search failed");
+      if (!response.ok) return "";
 
       const data = await response.json();
-      const results = data.query?.search || [];
-
-      for (const result of results) {
-        const infoParams = new URLSearchParams({
-          action: "query",
-          titles: result.title,
-          prop: "imageinfo",
-          iiprop: "url|mime",
-          iiurlwidth: "600",
-          format: "json",
-          formatversion: "2",
-          origin: "*"
-        });
-
-        const infoResponse = await fetch(
-          "https://commons.wikimedia.org/w/api.php?" + infoParams
-        );
-
-        if (!infoResponse.ok) continue;
-
-        const infoData = await infoResponse.json();
-        const pages = infoData.query?.pages || [];
-        const info = pages[0]?.imageinfo?.[0];
-
-        if (!info || !info.mime?.startsWith("image/")) continue;
-
-        const url = info.thumburl || info.url;
-        if (!url) continue;
-
-        cache.set(search, url);
-        return url;
-      }
-
-      cache.set(search, "");
-      return "";
-    } catch (error) {
-      console.error("Comic image search failed:", search, error);
+      const url = data.thumbnail?.source || "";
+      imageCache.set(page, url);
+      return url;
+    } catch {
       return "";
     }
   }
 
-  async function addImages(card) {
+  async function addPictures(card) {
     const heading = card.querySelector("h3");
     const slot = card.querySelector(".image-slot");
+    if (!heading || !slot || slot.dataset.upgraded) return;
 
-    if (!heading || !slot || slot.dataset.imageUpgrade === "done") return;
+    const names = characterImages[heading.textContent.trim()];
+    if (!names) return;
 
-    const searches = imageNames[heading.textContent.trim()];
-    if (!searches) return;
-
-    slot.dataset.imageUpgrade = "done";
+    slot.dataset.upgraded = "true";
     slot.innerHTML = "";
 
-    for (let i = 0; i < searches.length; i++) {
+    const labels = ["MCU ACTOR", "COMIC ARTWORK"];
+
+    for (let i = 0; i < names.length; i++) {
       const figure = document.createElement("figure");
-      figure.style.cssText = "margin:14px 0;";
+      figure.style.cssText = "margin:10px 0;";
 
       const caption = document.createElement("figcaption");
-      caption.textContent = i === 0 ? "MCU ACTOR" : "COMIC ARTWORK";
+      caption.textContent = labels[i];
       caption.style.cssText =
-        "font-weight:bold;color:#9db8ff;font-size:13px;margin-bottom:8px;";
+        "font-weight:bold;font-size:12px;color:#9db8ff;margin-bottom:6px;";
 
-      const image = document.createElement("img");
-      image.alt = heading.textContent + " — " + caption.textContent;
-      image.loading = "lazy";
-      image.style.cssText =
-        "display:block;width:100%;max-height:260px;object-fit:contain;" +
+      const img = document.createElement("img");
+      img.alt = heading.textContent + " - " + labels[i];
+      img.loading = "lazy";
+      img.style.cssText =
+        "width:100%;max-height:240px;object-fit:contain;" +
         "border-radius:12px;background:#1b2738;";
 
-      figure.append(caption, image);
+      figure.append(caption, img);
       slot.appendChild(figure);
 
-      const url = await findImage(searches[i]);
-
+      const url = await getPicture(names[i]);
       if (url) {
-        image.onerror = () => {
-          image.remove();
-          caption.textContent += " — unavailable";
-        };
-
-        image.src = url;
+        img.src = url;
       } else {
-        caption.textContent += " — unavailable";
+        caption.textContent += " — image unavailable";
       }
     }
   }
 
-  function scanCharacters() {
+  function upgradeCharacters() {
     document.querySelectorAll("#characterItems .character-card")
-      .forEach(card => addImages(card));
+      .forEach(addPictures);
   }
 
-  scanCharacters();
+  upgradeCharacters();
 
-  const container = document.getElementById("characterItems");
-
-  if (container) {
-    new MutationObserver(scanCharacters).observe(container, {
-      childList: true,
-      subtree: true
-    });
-  }
-
-  console.log("Character image upgrade loaded.");
+  new MutationObserver(upgradeCharacters).observe(
+    document.getElementById("characterItems") || document.body,
+    { childList: true, subtree: true }
+  );
 })();
+
 

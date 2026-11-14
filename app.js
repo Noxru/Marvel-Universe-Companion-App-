@@ -1202,6 +1202,118 @@ console.log('MARVEL MARATHON initialized.');
   document.head.appendChild(style);
 })();
 
+/* ======================================================
+   CHARACTER IMAGE UPGRADE — MCU ACTORS + COMIC ART
+   ====================================================== */
+(() => {
+  const characterImages = {
+    "Iron Man": ["Robert Downey Jr.", "Iron Man (character)"],
+    "Captain America": ["Chris Evans (actor)", "Captain America"],
+    "Thor": ["Chris Hemsworth", "Thor (Marvel Comics)"],
+    "Hulk": ["Mark Ruffalo", "Hulk (comics)"],
+    "Black Widow": ["Scarlett Johansson", "Black Widow (Natasha Romanova)"],
+    "Hawkeye": ["Jeremy Renner", "Hawkeye (Clint Barton)"],
+    "Spider-Man": ["Tom Holland (actor)", "Spider-Man"],
+    "Doctor Strange": ["Benedict Cumberbatch", "Doctor Strange"],
+    "Black Panther": ["Chadwick Boseman", "Black Panther (character)"],
+    "Captain Marvel": ["Brie Larson", "Captain Marvel (Carol Danvers)"],
+    "Scarlet Witch": ["Elizabeth Olsen", "Scarlet Witch"],
+    "Loki": ["Tom Hiddleston", "Loki (Marvel Comics)"],
+    "Deadpool": ["Ryan Reynolds", "Deadpool"],
+    "Wolverine": ["Hugh Jackman", "Wolverine (character)"],
+    "Professor X": ["Patrick Stewart", "Professor X"],
+    "Magneto": ["Ian McKellen", "Magneto (Marvel Comics)"],
+    "Phoenix": ["Sophie Turner", "Jean Grey"],
+    "Miles Morales": ["Shameik Moore", "Miles Morales"],
+    "Venom": ["Tom Hardy", "Venom (character)"],
+    "Mister Fantastic": ["Pedro Pascal", "Mister Fantastic"],
+    "Invisible Woman": ["Vanessa Kirby", "Invisible Woman"],
+    "Human Torch": ["Joseph Quinn (actor)", "Human Torch"],
+    "The Thing": ["Ebon Moss-Bachrach", "Thing (comics)"],
+    "Daredevil": ["Charlie Cox (actor)", "Daredevil"],
+    "The Punisher": ["Jon Bernthal", "Punisher"],
+    "Jessica Jones": ["Krysten Ritter", "Jessica Jones"],
+    "Luke Cage": ["Mike Colter", "Luke Cage"],
+    "Ms. Marvel": ["Iman Vellani", "Kamala Khan"],
+    "Yelena Belova": ["Florence Pugh", "Yelena Belova"]
+  };
+
+  const imageCache = new Map();
+
+  async function getPicture(page) {
+    if (imageCache.has(page)) return imageCache.get(page);
+
+    try {
+      const response = await fetch(
+        "https://en.wikipedia.org/api/rest_v1/page/summary/" +
+        encodeURIComponent(page.replaceAll(" ", "_"))
+      );
+
+      if (!response.ok) return "";
+
+      const data = await response.json();
+      const url = data.thumbnail?.source || "";
+      imageCache.set(page, url);
+      return url;
+    } catch {
+      return "";
+    }
+  }
+
+  async function addPictures(card) {
+    const heading = card.querySelector("h3");
+    const slot = card.querySelector(".image-slot");
+    if (!heading || !slot || slot.dataset.upgraded) return;
+
+    const names = characterImages[heading.textContent.trim()];
+    if (!names) return;
+
+    slot.dataset.upgraded = "true";
+    slot.innerHTML = "";
+
+    const labels = ["MCU ACTOR", "COMIC ARTWORK"];
+
+    for (let i = 0; i < names.length; i++) {
+      const figure = document.createElement("figure");
+      figure.style.cssText = "margin:10px 0;";
+
+      const caption = document.createElement("figcaption");
+      caption.textContent = labels[i];
+      caption.style.cssText =
+        "font-weight:bold;font-size:12px;color:#9db8ff;margin-bottom:6px;";
+
+      const img = document.createElement("img");
+      img.alt = heading.textContent + " - " + labels[i];
+      img.loading = "lazy";
+      img.style.cssText =
+        "width:100%;max-height:240px;object-fit:contain;" +
+        "border-radius:12px;background:#1b2738;";
+
+      figure.append(caption, img);
+      slot.appendChild(figure);
+
+      const url = await getPicture(names[i]);
+      if (url) {
+        img.src = url;
+      } else {
+        caption.textContent += " — image unavailable";
+      }
+    }
+  }
+
+  function upgradeCharacters() {
+    document.querySelectorAll("#characterItems .character-card")
+      .forEach(addPictures);
+  }
+
+  upgradeCharacters();
+
+  new MutationObserver(upgradeCharacters).observe(
+    document.getElementById("characterItems") || document.body,
+    { childList: true, subtree: true }
+  );
+})();
+
 
 
 

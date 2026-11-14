@@ -1303,41 +1303,72 @@ console.log('MARVEL MARATHON initialized.');
 
   const cache = new Map();
 
-  async function findImage(search) {
-    if (cache.has(search)) return cache.get(search);
+  
 
-    try {
-      const params = new URLSearchParams({
+async function findImage(search) {
+  if (cache.has(search)) return cache.get(search);
+
+  try {
+    const params = new URLSearchParams({
+      action: "query",
+      list: "search",
+      srsearch: search,
+      srnamespace: "6",
+      srlimit: "8",
+      format: "json",
+      formatversion: "2",
+      origin: "*"
+    });
+
+    const response = await fetch(
+      "https://commons.wikimedia.org/w/api.php?" + params
+    );
+
+    if (!response.ok) throw new Error("Search failed");
+
+    const data = await response.json();
+    const results = data.query?.search || [];
+
+    for (const result of results) {
+      const infoParams = new URLSearchParams({
         action: "query",
-        generator: "search",
-        gsrsearch: "filetype:bitmap " + search,
-        gsrnamespace: "6",
-        gsrlimit: "1",
+        titles: result.title,
         prop: "imageinfo",
-        iiprop: "url",
+        iiprop: "url|mime",
         iiurlwidth: "600",
         format: "json",
+        formatversion: "2",
         origin: "*"
       });
 
-      const response = await fetch(
-        "https://commons.wikimedia.org/w/api.php?" + params
+      const infoResponse = await fetch(
+        "https://commons.wikimedia.org/w/api.php?" + infoParams
       );
 
-      if (!response.ok) throw new Error("Image search failed");
+      if (!infoResponse.ok) continue;
 
-      const data = await response.json();
-      const pages = Object.values(data.query?.pages || {});
-      const url = pages[0]?.imageinfo?.[0]?.thumburl ||
-                  pages[0]?.imageinfo?.[0]?.url || "";
+      const infoData = await infoResponse.json();
+      const pages = infoData.query?.pages || [];
+      const info = pages[0]?.imageinfo?.[0];
+
+      if (!info || !info.mime?.startsWith("image/")) continue;
+
+      const url = info.thumburl || info.url;
+      if (!url) continue;
 
       cache.set(search, url);
       return url;
-    } catch (error) {
-      console.error("Character image error:", search, error);
-      return "";
     }
+
+    cache.set(search, "");
+    return "";
+  } catch (error) {
+    console.error("Comic image search failed:", search, error);
+    return "";
   }
+}
+
+
 
   async function addImages(card) {
     const heading = card.querySelector("h3");

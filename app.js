@@ -980,7 +980,7 @@ console.log('MARVEL MARATHON initialized.');
 (() => {
   const characterImages = {
     "Iron Man": ["Robert Downey Jr.", "Iron Man (character)"],
-    "Captain America": ["Chris Evans (actor)", "Captain America"],
+    "Captain America": ["Chris Evans (actor)", "Captain America(comic book character"],
     "Thor": ["Chris Hemsworth", "Thor (Marvel Comics)"],
     "Hulk": ["Mark Ruffalo", "Hulk (comics)"],
     "Black Widow": ["Scarlett Johansson", "Black Widow (Natasha Romanova)"],
@@ -1002,7 +1002,7 @@ console.log('MARVEL MARATHON initialized.');
     "Invisible Woman": ["Vanessa Kirby", "Invisible Woman"],
     "Human Torch": ["Joseph Quinn (actor)", "Human Torch"],
     "The Thing": ["Ebon Moss-Bachrach", "Thing (comics)"],
-    "Daredevil": ["Charlie Cox (actor)", "Daredevil"],
+    "Daredevil": ["Charlie Cox (actor)", "Daredevil(Marvel Comics character)"],
     "The Punisher": ["Jon Bernthal", "Punisher"],
     "Jessica Jones": ["Krysten Ritter", "Jessica Jones"],
     "Luke Cage": ["Mike Colter", "Luke Cage"],

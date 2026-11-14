@@ -213,7 +213,7 @@
 
   // CHANGE APP SECTION
   function setView(view) {
-    if (!$ (view)) return;
+    if (!$(view)) return;
 
     currentView = view;
 

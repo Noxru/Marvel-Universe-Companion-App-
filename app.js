@@ -164,6 +164,47 @@
   ];
 
   // END OF CHARACTER AND TEAM DATA   // WATCH PROGRESS
+  // CHARACTER IMAGE LOADER
+const characterImageCache = new Map();
+
+async function getCharacterImage(name) {
+  if (characterImageCache.has(name)) {
+    return characterImageCache.get(name);
+  }
+
+  const request = fetch(
+    "https://en.wikipedia.org/api/rest_v1/page/summary/" +
+    encodeURIComponent(name.replaceAll(" ", "_"))
+  )
+    .then(response => {
+      if (!response.ok) return null;
+      return response.json();
+    })
+    .then(data => data.thumbnail?.source || null)
+    .catch(() => null);
+
+  characterImageCache.set(name, request);
+  return request;
+}
+
+function addProfileImage(container, name, alt) {
+  const image = document.createElement("img");
+
+  image.alt = alt;
+  image.loading = "lazy";
+  image.style.width = "100%";
+  image.style.maxHeight = "260px";
+  image.style.objectFit = "contain";
+  image.style.borderRadius = "14px";
+  image.style.marginBottom = "15px";
+
+  container.prepend(image);
+
+  getCharacterImage(name).then(source => {
+    if (source) {
+      image.src = source;
+    } else {
+      image.remove();
   let watched = new Set();
 
   try {
@@ -458,47 +499,7 @@
       $("watchItems").append(makeItem(item, true));
     });
 
-// CHARACTER IMAGE LOADER
-const characterImageCache = new Map();
 
-async function getCharacterImage(name) {
-  if (characterImageCache.has(name)) {
-    return characterImageCache.get(name);
-  }
-
-  const request = fetch(
-    "https://en.wikipedia.org/api/rest_v1/page/summary/" +
-    encodeURIComponent(name.replaceAll(" ", "_"))
-  )
-    .then(response => {
-      if (!response.ok) return null;
-      return response.json();
-    })
-    .then(data => data.thumbnail?.source || null)
-    .catch(() => null);
-
-  characterImageCache.set(name, request);
-  return request;
-}
-
-function addProfileImage(container, name, alt) {
-  const image = document.createElement("img");
-
-  image.alt = alt;
-  image.loading = "lazy";
-  image.style.width = "100%";
-  image.style.maxHeight = "260px";
-  image.style.objectFit = "contain";
-  image.style.borderRadius = "14px";
-  image.style.marginBottom = "15px";
-
-  container.prepend(image);
-
-  getCharacterImage(name).then(source => {
-    if (source) {
-      image.src = source;
-    } else {
-      image.remove();
     }
   });
 }

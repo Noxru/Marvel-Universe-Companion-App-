@@ -941,3 +941,216 @@ console.log('MARVEL MARATHON initialized.');
 
 })();
 
+
+/* ==========================================================
+   DOOMSDAY PREP — SEPARATE WATCHLIST ADD-ON
+   ========================================================== */
+
+(() => {
+  const DOOMSDAY_KEY = 'marvelDoomsdayPrepProgress';
+
+  const prepList = [
+    // ESSENTIAL
+    {id:'cap-first',title:'Captain America: The First Avenger',group:'Essential',note:'Steve Rogers and the origins of Captain America.'},
+    {id:'iron-man',title:'Iron Man',group:'Essential',note:'The beginning of the MCU.'},
+    {id:'avengers',title:'The Avengers',group:'Essential',note:'The original Avengers assemble.'},
+    {id:'winter-soldier',title:'Captain America: The Winter Soldier',group:'Essential',note:'S.H.I.E.L.D., HYDRA and the wider world.'},
+    {id:'ultron',title:'Avengers: Age of Ultron',group:'Essential',note:'The creation of Ultron and the Avengers.'},
+    {id:'civil-war',title:'Captain America: Civil War',group:'Essential',note:'The Avengers split apart.'},
+    {id:'doctor-strange',title:'Doctor Strange',group:'Essential',note:'Introduces the mystic side of the MCU.'},
+    {id:'infinity-war',title:'Avengers: Infinity War',group:'Essential',note:'The universe faces Thanos.'},
+    {id:'endgame',title:'Avengers: Endgame',group:'Essential',note:'The consequences of the Infinity Saga.'},
+    {id:'loki-1',title:'Loki — Season 1',group:'Essential',note:'Introduces the TVA and multiverse story.'},
+    {id:'loki-2',title:'Loki — Season 2',group:'Essential',note:'Continues the multiverse storyline.'},
+    {id:'multiverse-madness',title:'Doctor Strange in the Multiverse of Madness',group:'Essential',note:'Explores incursions and alternate realities.'},
+    {id:'fantastic-four-first',title:'The Fantastic Four: First Steps',group:'Essential',note:'Introduces Marvel’s First Family.'},
+    {id:'thunderbolts',title:'Thunderbolts*',group:'Essential',note:'Introduces the team and its place in the MCU.'},
+
+    // RECOMMENDED
+    {id:'thor',title:'Thor',group:'Recommended',note:'Introduces Asgard and Thor.'},
+    {id:'ragnarok',title:'Thor: Ragnarok',group:'Recommended',note:'Important Asgardian history.'},
+    {id:'guardians',title:'Guardians of the Galaxy',group:'Recommended',note:'Cosmic Marvel background.'},
+    {id:'guardians-3',title:'Guardians of the Galaxy Vol. 3',group:'Recommended',note:'Continues the cosmic storyline.'},
+    {id:'wandavision',title:'WandaVision',group:'Recommended',note:'Important character and reality-changing events.'},
+    {id:'falcon-winter',title:'The Falcon and the Winter Soldier',group:'Recommended',note:'Sam Wilson’s journey as Captain America.'},
+    {id:'ms-marvel',title:'Ms. Marvel',group:'Recommended',note:'Introduces Kamala Khan.'},
+    {id:'marvels',title:'The Marvels',group:'Recommended',note:'Connects Carol, Monica and Kamala.'},
+    {id:'quantumania',title:'Ant-Man and the Wasp: Quantumania',group:'Recommended',note:'Introduces Kang and the Quantum Realm.'},
+    {id:'captain-america-brave',title:'Captain America: Brave New World',group:'Recommended',note:'Continues Sam Wilson’s story.'},
+    {id:'visionquest',title:'VisionQuest',group:'Recommended',note:'Continues Vision’s story.'},
+    {id:'spider-brand-new-day',title:'Spider-Man: Brand New Day',group:'Recommended',note:'Peter Parker’s latest MCU chapter.'},
+
+    // OPTIONAL
+    {id:'iron-man-2',title:'Iron Man 2',group:'Optional',note:'More Tony Stark background.'},
+    {id:'iron-man-3',title:'Iron Man 3',group:'Optional',note:'Tony Stark’s personal journey.'},
+    {id:'dark-world',title:'Thor: The Dark World',group:'Optional',note:'More Infinity Stone history.'},
+    {id:'ant-man',title:'Ant-Man',group:'Optional',note:'Introduces Scott Lang.'},
+    {id:'antman-wasp',title:'Ant-Man and the Wasp',group:'Optional',note:'More Quantum Realm background.'},
+    {id:'black-panther',title:'Black Panther',group:'Optional',note:'Wakanda and its history.'},
+    {id:'wakanda-forever',title:'Black Panther: Wakanda Forever',group:'Optional',note:'Continues Wakanda’s story.'},
+    {id:'eternals',title:'Eternals',group:'Optional',note:'Expands the cosmic side of Marvel.'},
+    {id:'echo',title:'Echo',group:'Optional',note:'Street-level MCU background.'},
+    {id:'agatha',title:'Agatha All Along',group:'Optional',note:'More magical MCU background.'}
+  ];
+
+  let watched = [];
+
+  try {
+    watched = JSON.parse(localStorage.getItem(DOOMSDAY_KEY) || '[]');
+    if (!Array.isArray(watched)) watched = [];
+  } catch {
+    watched = [];
+  }
+
+  const nav = document.querySelector('nav.tabs');
+  const bottom = document.querySelector('footer.bottom');
+  const main = document.querySelector('main');
+
+  if (!nav || !bottom || !main) return;
+
+  if (!document.getElementById('doomsday-prep')) {
+    const topButton = document.createElement('button');
+    topButton.className = 'tab';
+    topButton.dataset.doomsdayTab = 'true';
+    topButton.textContent = 'Doomsday Prep';
+    nav.appendChild(topButton);
+
+    const bottomButton = document.createElement('button');
+    bottomButton.dataset.doomsdayTab = 'true';
+    bottomButton.textContent = 'Doomsday Prep';
+    bottom.appendChild(bottomButton);
+
+    const section = document.createElement('section');
+    section.id = 'doomsday-prep';
+    section.className = 'view';
+
+    section.innerHTML = `
+      <div class="section-title">
+        <h2>DOOMSDAY PREP</h2>
+        <span class="muted">Your road to Avengers: Doomsday</span>
+      </div>
+
+      <div class="card" style="margin-bottom:18px">
+        <h3 id="doomsday-progress">0% complete</h3>
+        <div style="height:12px;background:#263247;border-radius:20px;overflow:hidden">
+          <div id="doomsday-bar" style="height:100%;width:0%;background:#8b5cf6;transition:width .2s"></div>
+        </div>
+        <p id="doomsday-count" class="muted">0 of 0 watched</p>
+      </div>
+
+      <p class="note">
+        A curated fan-made viewing guide. Essential means most useful
+        for following the story, not an officially confirmed requirement.
+      </p>
+
+      <div id="doomsday-items"></div>
+
+      <button class="btn" id="doomsday-reset" style="margin-top:16px">
+        Reset Doomsday progress
+      </button>
+    `;
+
+    main.appendChild(section);
+  }
+
+  function render() {
+    const container = document.getElementById('doomsday-items');
+    if (!container) return;
+
+    const groups = ['Essential','Recommended','Optional'];
+
+    container.innerHTML = groups.map(group => {
+      const entries = prepList.filter(item => item.group === group);
+      const completed = entries.filter(item => watched.includes(item.id)).length;
+
+      return `
+        <div style="margin:24px 0">
+          <div class="section-title">
+            <h2>${group}</h2>
+            <span class="muted">${completed}/${entries.length}</span>
+          </div>
+
+          ${entries.map(item => `
+            <label class="item" style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;cursor:pointer">
+              <input
+                type="checkbox"
+                data-doomsday-check="${item.id}"
+                ${watched.includes(item.id) ? 'checked' : ''}
+                style="width:20px;height:20px;accent-color:#8b5cf6;flex-shrink:0"
+              >
+              <span class="item-main">
+                <strong>${item.title}</strong>
+                <span class="item-note" style="display:block">${item.note}</span>
+              </span>
+            </label>
+          `).join('')}
+        </div>
+      `;
+    }).join('');
+
+    const completed = prepList.filter(item => watched.includes(item.id)).length;
+    const percentage = Math.round(completed / prepList.length * 100);
+
+    document.getElementById('doomsday-progress').textContent =
+      percentage + '% complete';
+
+    document.getElementById('doomsday-count').textContent =
+      completed + ' of ' + prepList.length + ' watched';
+
+    document.getElementById('doomsday-bar').style.width =
+      percentage + '%';
+  }
+
+  function showTab() {
+    document.querySelectorAll('.view').forEach(view => {
+      view.classList.toggle('active', view.id === 'doomsday-prep');
+    });
+
+    document.querySelectorAll('[data-view]').forEach(button => {
+      button.classList.remove('active');
+    });
+
+    document.querySelectorAll('[data-extra-view]').forEach(button => {
+      button.classList.remove('active');
+    });
+
+    document.querySelectorAll('[data-doomsday-tab]').forEach(button => {
+      button.classList.add('active');
+    });
+
+    window.scrollTo({top:0,behavior:'smooth'});
+    render();
+  }
+
+  document.addEventListener('click', event => {
+    if (event.target.closest('[data-doomsday-tab]')) {
+      showTab();
+    }
+
+    if (event.target.closest('#doomsday-reset')) {
+      if (!confirm('Reset your Doomsday viewing progress?')) return;
+      watched = [];
+      localStorage.setItem(DOOMSDAY_KEY, JSON.stringify(watched));
+      render();
+    }
+  });
+
+  document.addEventListener('change', event => {
+    const checkbox = event.target.closest('[data-doomsday-check]');
+    if (!checkbox) return;
+
+    const id = checkbox.dataset.doomsdayCheck;
+
+    watched = checkbox.checked
+      ? [...new Set([...watched,id])]
+      : watched.filter(item => item !== id);
+
+    localStorage.setItem(DOOMSDAY_KEY, JSON.stringify(watched));
+    render();
+  });
+
+  render();
+  console.log('Doomsday Prep added.');
+})();
+
+

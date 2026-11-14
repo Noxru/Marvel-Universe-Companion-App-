@@ -1,3 +1,5 @@
+
+
 /* ==========================================================
    MARVEL MARATHON — COMPLETE APP REPLACEMENT
    Version: November 2026
@@ -10,22 +12,9 @@ const $ = id => document.getElementById(id);
 const KEY = 'marvelMarathonCompanionProgress';
 
 const universes = [
-  'MCU',
-  'X-Men',
-  'Deadpool',
-  'Fantastic Four',
-  'Sony Spider-Man',
-  'Animated Marvel',
-  'Other Marvel'
+  'MCU', 'X-Men', 'Deadpool', 'Fantastic Four',
+  'Sony Spider-Man', 'Animated Marvel', 'Other Marvel'
 ];
-
-/* ----------------------------------------------------------
-   RELEASED MARVEL SCREEN PRODUCTIONS
-
-   Format:
-   [id, title, format, universe, storyYear, releaseYear,
-    essential, description, extra]
-   ---------------------------------------------------------- */
 
 const titles = [
 ['captain-america-1944','Captain America','Serial','Other Marvel',1944,1944,0,'The original live-action Captain America serial.','15 chapters'],
@@ -65,8 +54,6 @@ const titles = [
 ['spider-verse','Spider-Man: Into the Spider-Verse','Animated Movie','Sony Spider-Man',2018,2018,0,'Miles Morales discovers the multiverse.',''],
 ['spider-verse-2','Spider-Man: Across the Spider-Verse','Animated Movie','Sony Spider-Man',2023,2023,0,'Miles meets the Spider Society.',''],
 
-/* MCU FEATURE FILMS */
-
 ['iron-man','Iron Man','Movie','MCU',2008,2008,1,'Tony Stark builds the first Iron Man suit.',''],
 ['hulk','The Incredible Hulk','Movie','MCU',2010,2008,0,'Bruce Banner searches for a cure.',''],
 ['iron-man-2','Iron Man 2','Movie','MCU',2010,2010,1,'Tony faces new enemies.',''],
@@ -104,8 +91,6 @@ const titles = [
 ['fantastic-four-first','The Fantastic Four: First Steps','Movie','MCU',1960,2025,1,'Marvel’s First Family enters the multiverse.',''],
 ['spider-brand-new-day','Spider-Man: Brand New Day','Movie','MCU',2026,2026,1,'Peter Parker returns.','Released July 31, 2026'],
 
-/* MCU SERIES AND SPECIALS */
-
 ['agent-carter-short','Agent Carter (One-Shot)','Short','MCU',1946,2013,0,'Peggy Carter takes on a covert mission.',''],
 ['agent-carter-s1','Agent Carter — Season 1','Series','MCU',1946,2015,0,'Peggy Carter works for the SSR.','8 episodes'],
 ['agent-carter-s2','Agent Carter — Season 2','Series','MCU',1947,2016,0,'Peggy investigates a new threat in Los Angeles.','10 episodes · cancelled'],
@@ -142,8 +127,6 @@ const titles = [
 ['one-shot-item47','Item 47','Short','MCU',2012,2012,0,'A couple find alien technology.',''],
 ['one-shot-agent','Agent Carter','Short','MCU',1946,2013,0,'Peggy Carter takes on a mission.',''],
 ['one-shot-allhail','All Hail the King','Short','MCU',2014,2014,0,'Trevor Slattery faces the consequences.',''],
-
-/* X-MEN, SPIDER-MAN AND OTHER ANIMATION */
 
 ['xmen-animated','X-Men: The Animated Series','Animated Series','X-Men',1992,1992,0,'The classic animated X-Men series.','5 seasons'],
 ['xmen-97','X-Men ’97 — Season 1','Animated Series','X-Men',1997,2024,0,'The X-Men continue their animated adventures.','10 episodes'],
@@ -186,11 +169,6 @@ const titles = [
 ['gifted','The Gifted','Series','X-Men',2017,2017,0,'Mutants fight for survival.','2 seasons']
 ];
 
-/* ----------------------------------------------------------
-   UPCOMING MCU
-   Released titles are not shown here.
-   ---------------------------------------------------------- */
-
 const upcoming = [
 ['Avengers: Doomsday','Movie','17 December 2026 — Australia','Officially dated'],
 ['Avengers: Secret Wars','Movie','17 December 2027','Officially dated'],
@@ -207,13 +185,6 @@ const upcoming = [
 ['Armor Wars','Movie','TBA','In development'],
 ['Deadpool 4','Movie','TBA','Reported / unconfirmed']
 ];
-
-/* ----------------------------------------------------------
-   CANCELLED AND ABANDONED PROJECTS
-   Unreleased projects remain separate from the released
-   catalog. Status descriptions distinguish cancellation
-   from development changes and abandoned proposals.
-   ---------------------------------------------------------- */
 
 const cancelled = [
 ['Marvel’s Most Wanted','Series','Cancelled','Agents of S.H.I.E.L.D. spin-off starring Bobbi Morse and Lance Hunter.'],
@@ -428,7 +399,6 @@ document.addEventListener('click',event=>{
 
   const id=button.dataset.extraView;
   setView(id);
-  renderExtraTab(id);
 });
 
 /* ----------------------------------------------------------
@@ -941,57 +911,6 @@ console.log('MARVEL MARATHON initialized.');
 
 })();
 
-/* ==========================================================
-   DOOMSDAY PREP — SEPARATE WATCHLIST ADD-ON
-   ========================================================== */
-
-(() => {
-  const DOOMSDAY_KEY = 'marvelDoomsdayPrepProgress';
-
-  const prepList = [
-    // ESSENTIAL
-    {id:'cap-first',title:'Captain America: The First Avenger',group:'Essential',note:'Steve Rogers and the origins of Captain America.'},
-    {id:'iron-man',title:'Iron Man',group:'Essential',note:'The beginning of the MCU.'},
-    {id:'avengers',title:'The Avengers',group:'Essential',note:'The original Avengers assemble.'},
-    {id:'winter-soldier',title:'Captain America: The Winter Soldier',group:'Essential',note:'S.H.I.E.L.D., HYDRA and the wider world.'},
-    {id:'ultron',title:'Avengers: Age of Ultron',group:'Essential',note:'The creation of Ultron and the Avengers.'},
-    {id:'civil-war',title:'Captain America: Civil War',group:'Essential',note:'The Avengers split apart.'},
-    {id:'doctor-strange',title:'Doctor Strange',group:'Essential',note:'Introduces the mystic side of the MCU.'},
-    {id:'infinity-war',title:'Avengers: Infinity War',group:'Essential',note:'The universe faces Thanos.'},
-    {id:'endgame',title:'Avengers: Endgame',group:'Essential',note:'The consequences of the Infinity Saga.'},
-    {id:'loki-1',title:'Loki — Season 1',group:'Essential',note:'Introduces the TVA and multiverse story.'},
-    {id:'loki-2',title:'Loki — Season 2',group:'Essential',note:'Continues the multiverse storyline.'},
-    {id:'multiverse-madness',title:'Doctor Strange in the Multiverse of Madness',group:'Essential',note:'Explores incursions and alternate realities.'},
-    {id:'fantastic-four-first',title:'The Fantastic Four: First Steps',group:'Essential',note:'Introduces Marvel’s First Family.'},
-    {id:'thunderbolts',title:'Thunderbolts*',group:'Essential',note:'Introduces the team and its place in the MCU.'},
-
-    // RECOMMENDED
-    {id:'thor',title:'Thor',group:'Recommended',note:'Introduces Asgard and Thor.'},
-    {id:'ragnarok',title:'Thor: Ragnarok',group:'Recommended',note:'Important Asgardian history.'},
-    {id:'guardians',title:'Guardians of the Galaxy',group:'Recommended',note:'Cosmic Marvel background.'},
-    {id:'guardians-3',title:'Guardians of the Galaxy Vol. 3',group:'Recommended',note:'Continues the cosmic storyline.'},
-    {id:'wandavision',title:'WandaVision',group:'Recommended',note:'Important character and reality-changing events.'},
-    {id:'falcon-winter',title:'The Falcon and the Winter Soldier',group:'Recommended',note:'Sam Wilson’s journey as Captain America.'},
-    {id:'ms-marvel',title:'Ms. Marvel',group:'Recommended',note:'Introduces Kamala Khan.'},
-    {id:'marvels',title:'The Marvels',group:'Recommended',note:'Connects Carol, Monica and Kamala.'},
-    {id:'quantumania',title:'Ant-Man and the Wasp: Quantumania',group:'Recommended',note:'Introduces Kang and the Quantum Realm.'},
-    {id:'captain-america-brave',title:'Captain America: Brave New World',group:'Recommended',note:'Continues Sam Wilson’s story.'},
-    {id:'visionquest',title:'VisionQuest',group:'Recommended',note:'Continues Vision’s story.'},
-    {id:'spider-brand-new-day',title:'Spider-Man: Brand New Day',group:'Recommended',note:'Peter Parker’s latest MCU chapter.'},
-
-    // OPTIONAL
-    {id:'iron-man-2',title:'Iron Man 2',group:'Optional',note:'More Tony Stark background.'},
-    {id:'iron-man-3',title:'Iron Man 3',group:'Optional',note:'Tony Stark’s personal journey.'},
-    {id:'dark-world',title:'Thor: The Dark World',group:'Optional',note:'More Infinity Stone history.'},
-    {id:'ant-man',title:'Ant-Man',group:'Optional',note:'Introduces Scott Lang.'},
-    {id:'antman-wasp',title:'Ant-Man and the Wasp',group:'Optional',note:'More Quantum Realm background.'},
-    {id:'black-panther',title:'Black Panther',group:'Optional',note:'Wakanda and its history.'},
-    {id:'wakanda-forever',title:'Black Panther: Wakanda Forever',group:'Optional',note:'Continues Wakanda’s story.'},
-    {id:'eternals',title:'Eternals',group:'Optional',note:'Expands the cosmic side of Marvel.'},
-    {id:'echo',title:'Echo',group:'Optional',note:'Street-level MCU background.'},
-    {id:'agatha',title:'Agatha All Along',group:'Optional',note:'More magical MCU background.'}
-  ];
-
   let watched = [];
 
   try {
@@ -1152,7 +1071,6 @@ console.log('MARVEL MARATHON initialized.');
   console.log('Doomsday Prep added.');
 })();
 
-
 /* DOOMSDAY PREP — FORCE NAVIGATION BUTTONS */
 (() => {
   const topNav = document.querySelector('nav.tabs');
@@ -1183,6 +1101,7 @@ console.log('MARVEL MARATHON initialized.');
   addButton(topNav, true);
   addButton(bottomNav, false);
 })();
+
 /* EXTRA LARGE BOTTOM NAVIGATION */
 (() => {
   const style = document.createElement('style');
@@ -1201,69 +1120,6 @@ console.log('MARVEL MARATHON initialized.');
   `;
   document.head.appendChild(style);
 })();
-
-/* ======================================================
-   CHARACTER IMAGE UPGRADE — MCU ACTORS + COMIC ART
-   ====================================================== */
-(() => {
-  const characterImages = {
-    "Iron Man": ["Robert Downey Jr.", "Iron Man (character)"],
-    "Captain America": ["Chris Evans (actor)", "Captain America"],
-    "Thor": ["Chris Hemsworth", "Thor (Marvel Comics)"],
-    "Hulk": ["Mark Ruffalo", "Hulk (comics)"],
-    "Black Widow": ["Scarlett Johansson", "Black Widow (Natasha Romanova)"],
-    "Hawkeye": ["Jeremy Renner", "Hawkeye (Clint Barton)"],
-    "Spider-Man": ["Tom Holland (actor)", "Spider-Man"],
-    "Doctor Strange": ["Benedict Cumberbatch", "Doctor Strange"],
-    "Black Panther": ["Chadwick Boseman", "Black Panther (character)"],
-    "Captain Marvel": ["Brie Larson", "Captain Marvel (Carol Danvers)"],
-    "Scarlet Witch": ["Elizabeth Olsen", "Scarlet Witch"],
-    "Loki": ["Tom Hiddleston", "Loki (Marvel Comics)"],
-    "Deadpool": ["Ryan Reynolds", "Deadpool"],
-    "Wolverine": ["Hugh Jackman", "Wolverine (character)"],
-    "Professor X": ["Patrick Stewart", "Professor X"],
-    "Magneto": ["Ian McKellen", "Magneto (Marvel Comics)"],
-    "Phoenix": ["Sophie Turner", "Jean Grey"],
-    "Miles Morales": ["Shameik Moore", "Miles Morales"],
-    "Venom": ["Tom Hardy", "Venom (character)"],
-    "Mister Fantastic": ["Pedro Pascal", "Mister Fantastic"],
-    "Invisible Woman": ["Vanessa Kirby", "Invisible Woman"],
-    "Human Torch": ["Joseph Quinn (actor)", "Human Torch"],
-    "The Thing": ["Ebon Moss-Bachrach", "Thing (comics)"],
-    "Daredevil": ["Charlie Cox (actor)", "Daredevil"],
-    "The Punisher": ["Jon Bernthal", "Punisher"],
-    "Jessica Jones": ["Krysten Ritter", "Jessica Jones"],
-    "Luke Cage": ["Mike Colter", "Luke Cage"],
-    "Ms. Marvel": ["Iman Vellani", "Kamala Khan"],
-    "Yelena Belova": ["Florence Pugh", "Yelena Belova"]
-  };
-
-  const imageCache = new Map();
-
-  async function getPicture(page) {
-    if (imageCache.has(page)) return imageCache.get(page);
-
-    try {
-      const response = await fetch(
-        "https://en.wikipedia.org/api/rest_v1/page/summary/" +
-        encodeURIComponent(page.replaceAll(" ", "_"))
-      );
-
-      if (!response.ok) return "";
-
-      const data = await response.json();
-      const url = data.thumbnail?.source || "";
-      imageCache.set(page, url);
-      return url;
-    } catch {
-      return "";
-    }
-  }
-
-  async function addPictures(card) {
-    const heading = card.querySelector("h3");
-    const slot = card.querySelector(".image-slot");
-
 
 /* ======================================================
    CHARACTER IMAGES — ACTORS + COMIC ARTWORK
@@ -1303,72 +1159,68 @@ console.log('MARVEL MARATHON initialized.');
 
   const cache = new Map();
 
-  
+  async function findImage(search) {
+    if (cache.has(search)) return cache.get(search);
 
-async function findImage(search) {
-  if (cache.has(search)) return cache.get(search);
-
-  try {
-    const params = new URLSearchParams({
-      action: "query",
-      list: "search",
-      srsearch: search,
-      srnamespace: "6",
-      srlimit: "8",
-      format: "json",
-      formatversion: "2",
-      origin: "*"
-    });
-
-    const response = await fetch(
-      "https://commons.wikimedia.org/w/api.php?" + params
-    );
-
-    if (!response.ok) throw new Error("Search failed");
-
-    const data = await response.json();
-    const results = data.query?.search || [];
-
-    for (const result of results) {
-      const infoParams = new URLSearchParams({
+    try {
+      const params = new URLSearchParams({
         action: "query",
-        titles: result.title,
-        prop: "imageinfo",
-        iiprop: "url|mime",
-        iiurlwidth: "600",
+        list: "search",
+        srsearch: search,
+        srnamespace: "6",
+        srlimit: "8",
         format: "json",
         formatversion: "2",
         origin: "*"
       });
 
-      const infoResponse = await fetch(
-        "https://commons.wikimedia.org/w/api.php?" + infoParams
+      const response = await fetch(
+        "https://commons.wikimedia.org/w/api.php?" + params
       );
 
-      if (!infoResponse.ok) continue;
+      if (!response.ok) throw new Error("Search failed");
 
-      const infoData = await infoResponse.json();
-      const pages = infoData.query?.pages || [];
-      const info = pages[0]?.imageinfo?.[0];
+      const data = await response.json();
+      const results = data.query?.search || [];
 
-      if (!info || !info.mime?.startsWith("image/")) continue;
+      for (const result of results) {
+        const infoParams = new URLSearchParams({
+          action: "query",
+          titles: result.title,
+          prop: "imageinfo",
+          iiprop: "url|mime",
+          iiurlwidth: "600",
+          format: "json",
+          formatversion: "2",
+          origin: "*"
+        });
 
-      const url = info.thumburl || info.url;
-      if (!url) continue;
+        const infoResponse = await fetch(
+          "https://commons.wikimedia.org/w/api.php?" + infoParams
+        );
 
-      cache.set(search, url);
-      return url;
+        if (!infoResponse.ok) continue;
+
+        const infoData = await infoResponse.json();
+        const pages = infoData.query?.pages || [];
+        const info = pages[0]?.imageinfo?.[0];
+
+        if (!info || !info.mime?.startsWith("image/")) continue;
+
+        const url = info.thumburl || info.url;
+        if (!url) continue;
+
+        cache.set(search, url);
+        return url;
+      }
+
+      cache.set(search, "");
+      return "";
+    } catch (error) {
+      console.error("Comic image search failed:", search, error);
+      return "";
     }
-
-    cache.set(search, "");
-    return "";
-  } catch (error) {
-    console.error("Comic image search failed:", search, error);
-    return "";
   }
-}
-
-
 
   async function addImages(card) {
     const heading = card.querySelector("h3");
@@ -1404,11 +1256,12 @@ async function findImage(search) {
       const url = await findImage(searches[i]);
 
       if (url) {
-                image.onerror = () => {
+        image.onerror = () => {
           image.remove();
           caption.textContent += " — unavailable";
         };
-         image.src = url;
+
+        image.src = url;
       } else {
         caption.textContent += " — unavailable";
       }
@@ -1423,6 +1276,7 @@ async function findImage(search) {
   scanCharacters();
 
   const container = document.getElementById("characterItems");
+
   if (container) {
     new MutationObserver(scanCharacters).observe(container, {
       childList: true,
@@ -1432,10 +1286,4 @@ async function findImage(search) {
 
   console.log("Character image upgrade loaded.");
 })();
-
-
-
-
-
-
 

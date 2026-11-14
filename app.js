@@ -1183,7 +1183,7 @@ console.log('MARVEL MARATHON initialized.');
   addButton(topNav, true);
   addButton(bottomNav, false);
 })();
-* EXTRA LARGE BOTTOM NAVIGATION */
+/* EXTRA LARGE BOTTOM NAVIGATION */
 (() => {
   const style = document.createElement('style');
   style.textContent = `

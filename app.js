@@ -1373,11 +1373,11 @@ console.log('MARVEL MARATHON initialized.');
       const url = await findImage(searches[i]);
 
       if (url) {
-        image.src = url;
-        image.onerror = () => {
+                image.onerror = () => {
           image.remove();
           caption.textContent += " — unavailable";
         };
+         image.src = url;
       } else {
         caption.textContent += " — unavailable";
       }

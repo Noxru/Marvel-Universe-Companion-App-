@@ -687,7 +687,24 @@ function renderCharacters() {
     intro.textContent = description;
     intro.style.color = "#aab5c7";
 
-    panel.append(close, heading, intro);
+    panel.append(close);
+
+if (characters.some(character => character[1] === title)) {
+  const profileImage = document.createElement("img");
+  profileImage.alt = title;
+  profileImage.style.width = "100%";
+  profileImage.style.maxHeight = "320px";
+  profileImage.style.objectFit = "contain";
+  profileImage.style.borderRadius = "14px";
+
+  panel.append(profileImage);
+
+  getCharacterImage(title).then(source => {
+    if (source) profileImage.src = source;
+  });
+}
+
+panel.append(heading, intro);
 
     fields.forEach(field => {
       const section = document.createElement("div");

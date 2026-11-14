@@ -941,7 +941,6 @@ console.log('MARVEL MARATHON initialized.');
 
 })();
 
-
 /* ==========================================================
    DOOMSDAY PREP — SEPARATE WATCHLIST ADD-ON
    ========================================================== */
@@ -1152,20 +1151,37 @@ console.log('MARVEL MARATHON initialized.');
   render();
   console.log('Doomsday Prep added.');
 })();
-/* Keep Doomsday Prep visible in mobile navigation */
+
+
+/* DOOMSDAY PREP — FORCE NAVIGATION BUTTONS */
 (() => {
   const topNav = document.querySelector('nav.tabs');
   const bottomNav = document.querySelector('footer.bottom');
 
-  const topButton = document.querySelector('nav.tabs [data-doomsday-tab]');
-  const bottomButton = document.querySelector('footer.bottom [data-doomsday-tab]');
+  function addButton(nav, isTop) {
+    if (!nav) return;
 
-  if (topNav && topButton) {
-    topNav.insertBefore(topButton, topNav.querySelector('[data-view="universes"]'));
+    let button = nav.querySelector('[data-doomsday-tab]');
+
+    if (!button) {
+      button = document.createElement('button');
+      button.dataset.doomsdayTab = 'true';
+      button.textContent = 'Doomsday Prep';
+
+      if (isTop) button.className = 'tab';
+
+      nav.appendChild(button);
+    }
+
+    const libraryButton = nav.querySelector('[data-view="library"]');
+
+    if (libraryButton) {
+      libraryButton.after(button);
+    }
   }
 
-  if (bottomNav && bottomButton) {
-    bottomNav.insertBefore(bottomButton, bottomNav.querySelector('[data-view="universes"]'));
-  }
+  addButton(topNav, true);
+  addButton(bottomNav, false);
 })();
+
 

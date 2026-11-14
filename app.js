@@ -942,6 +942,133 @@ titles.push(
   ['fantastic-four-first-collection', 'The Fantastic Four: First Steps', 'Movie', 'Fantastic Four', 1960, 2025, 1, 'Marvel’s First Family enters the multiverse.', 'Also listed in the MCU collection']
 );
 
+
+
+/* ==========================================================
+   DOOMSDAY PREP — DEDICATED PAGE + BOTTOM NAVIGATION
+   ========================================================== */
+
+const doomsdayNav = document.querySelector('nav.tabs');
+const doomsdayBottom = document.querySelector('footer.bottom');
+
+function addDoomsdayButton(nav, isTop) {
+  if (!nav || nav.querySelector('[data-doomsday-tab]')) return;
+
+  const button = document.createElement('button');
+  button.dataset.doomsdayTab = 'true';
+  button.textContent = 'Doomsday Prep';
+
+  if (isTop) {
+    button.className = 'tab';
+  }
+
+  nav.appendChild(button);
+}
+
+addDoomsdayButton(doomsdayNav, true);
+addDoomsdayButton(doomsdayBottom, false);
+
+/* CREATE DOOMSDAY PAGE */
+
+if (!$('doomsday-prep')) {
+  const section = document.createElement('section');
+
+  section.id = 'doomsday-prep';
+  section.className = 'view';
+
+  section.innerHTML = `
+    <div class="section-title">
+      <h2>Avengers: Doomsday Prep</h2>
+      <span class="muted" id="doomsday-count"></span>
+    </div>
+
+    <div class="feature">
+      <div class="muted">THE ROAD TO DOOMSDAY</div>
+      <h3>Prepare for the next Avengers event</h3>
+      <p class="note">
+        Follow the essential Marvel movies and series
+        leading into Avengers: Doomsday.
+      </p>
+    </div>
+
+    <div class="controls">
+      <label class="field search">
+        Search
+        <input id="doomsday-search"
+          type="search"
+          placeholder="Search essential titles...">
+      </label>
+
+      <label class="field">
+        Order
+        <select id="doomsday-sort">
+          <option value="story">Story order</option>
+          <option value="release">Release order</option>
+          <option value="title">Title order</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="doomsday-items"></div>
+  `;
+
+  document.querySelector('main')?.appendChild(section);
+}
+
+/* DISPLAY ESSENTIAL TITLES */
+
+function renderDoomsdayPrep() {
+  const search = ($('doomsday-search')?.value || '').toLowerCase();
+
+  let list = titles.filter(item =>
+    item[6] === 1 &&
+    item.join(' ').toLowerCase().includes(search)
+  );
+
+  list = sortedTitles(
+    list,
+    $('doomsday-sort')?.value || 'story'
+  );
+
+  const watched = list.filter(item =>
+    progress.watched.includes(item[0])
+  ).length;
+
+  $('doomsday-count').textContent =
+    `${watched} of ${list.length} watched`;
+
+  $('doomsday-items').innerHTML = list.length
+    ? list.map(titleRow).join('')
+    : '<p class="note">No matching titles found.</p>';
+}
+
+/* NAVIGATION */
+
+document.addEventListener('click', event => {
+  const button = event.target.closest('[data-doomsday-tab]');
+  if (!button) return;
+
+  setView('doomsday-prep');
+  renderDoomsdayPrep();
+});
+
+/* SEARCH AND SORT */
+
+$('doomsday-search')?.addEventListener(
+  'input',
+  renderDoomsdayPrep
+);
+
+$('doomsday-sort')?.addEventListener(
+  'change',
+  renderDoomsdayPrep
+);
+
+/* ==========================================================
+   END DOOMSDAY PREP
+   ========================================================== */
+
+
 renderAll();
 
 
@@ -1099,103 +1226,6 @@ console.log('MARVEL MARATHON initialized.');
 
 
 
-/* ==========================================================
-   DOOMSDAY PREP — DEDICATED PAGE + BOTTOM NAVIGATION
-   ========================================================== */
-
-const doomsdayNav = document.querySelector('nav.tabs');
-const doomsdayBottom = document.querySelector('footer.bottom');
-
-function addDoomsdayButton(nav, isTop) {
-  if (!nav || nav.querySelector('[data-doomsday-tab]')) return;
-
-  const button = document.createElement('button');
-  button.dataset.doomsdayTab = 'true';
-  button.textContent = 'Doomsday Prep';
-
-  if (isTop) {
-    button.className = 'tab';
-  }
-
-  nav.appendChild(button);
-}
-
-addDoomsdayButton(doomsdayNav, true);
-addDoomsdayButton(doomsdayBottom, false);
-
-/* CREATE DOOMSDAY PAGE */
-
-if (!$('doomsday-prep')) {
-  const section = document.createElement('section');
-
-  section.id = 'doomsday-prep';
-  section.className = 'view';
-
-  section.innerHTML = `
-    <div class="section-title">
-      <h2>Avengers: Doomsday Prep</h2>
-      <span class="muted" id="doomsday-count"></span>
-    </div>
-
-    <div class="feature">
-      <div class="muted">THE ROAD TO DOOMSDAY</div>
-      <h3>Prepare for the next Avengers event</h3>
-      <p class="note">
-        Follow the essential Marvel movies and series
-        leading into Avengers: Doomsday.
-      </p>
-    </div>
-
-    <div class="controls">
-      <label class="field search">
-        Search
-        <input id="doomsday-search"
-          type="search"
-          placeholder="Search essential titles...">
-      </label>
-
-      <label class="field">
-        Order
-        <select id="doomsday-sort">
-          <option value="story">Story order</option>
-          <option value="release">Release order</option>
-          <option value="title">Title order</option>
-        </select>
-      </label>
-    </div>
-
-    <div id="doomsday-items"></div>
-  `;
-
-  document.querySelector('main')?.appendChild(section);
-}
-
-/* DISPLAY ESSENTIAL TITLES */
-
-function renderDoomsdayPrep() {
-  const search = ($('doomsday-search')?.value || '').toLowerCase();
-
-  let list = titles.filter(item =>
-    item[6] === 1 &&
-    item.join(' ').toLowerCase().includes(search)
-  );
-
-  list = sortedTitles(
-    list,
-    $('doomsday-sort')?.value || 'story'
-  );
-
-  const watched = list.filter(item =>
-    progress.watched.includes(item[0])
-  ).length;
-
-  $('doomsday-count').textContent =
-    `${watched} of ${list.length} watched`;
-
-  $('doomsday-items').innerHTML = list.length
-    ? list.map(titleRow).join('')
-    : '<p class="note">No matching titles found.</p>';
-}
 
 /* NAVIGATION */
 
@@ -1217,11 +1247,4 @@ $('doomsday-search')?.addEventListener(
 $('doomsday-sort')?.addEventListener(
   'change',
   renderDoomsdayPrep
-);
-
-/* ==========================================================
-   END DOOMSDAY PREP
-   ========================================================== */
-
-
 

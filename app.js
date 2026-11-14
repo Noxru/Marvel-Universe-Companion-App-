@@ -1271,7 +1271,7 @@ console.log('MARVEL MARATHON initialized.');
 (() => {
   const imageNames = {
     "Iron Man": ["Robert Downey Jr portrait", "Iron Man Marvel comic cover"],
-    "Captain America": ["Chris Evans portrait", "Mike Zeck Captain America sketch"],
+    "Captain America": ["Chris Evans (actor)", "Captain America"],
     "Thor": ["Chris Hemsworth portrait", "Thor Marvel comic cover"],
     "Hulk": ["Mark Ruffalo portrait", "Hulk Marvel comic cover"],
     "Black Widow": ["Scarlett Johansson portrait", "Black Widow Marvel comic cover"],

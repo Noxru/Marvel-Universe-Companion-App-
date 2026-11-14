@@ -40,8 +40,8 @@ const expanded = [
 ["gotgholiday","The Guardians of the Galaxy Holiday Special","Special","MCU",2025,2022,"extra","A festive Guardians story."],
 ["echo","Echo","Series","MCU",2025,2024,"recommended","Maya Lopez returns home."],
 ["agatha","Agatha All Along","Series","MCU",2026,2024,"recommended","Agatha Harkness follows a dangerous magical path."],
-["whatif","What If...?","Animated Series","MCU",Null,2021,"recommended","Animated alternate-reality stories across the multiverse."],
-["marvelzombies","Marvel Zombies","Animated Series","MCU",Null,2025,"extra","An animated undead multiverse story."],
+["whatif","What If...?","Animated Series","MCU",null,2021,"recommended","Animated alternate-reality stories across the multiverse."],
+["marvelzombies","Marvel Zombies","Animated Series","MCU",null,2025,"extra","An animated undead multiverse story."],
 ["ihulk","The Incredible Hulk (1978)","Series","Other Marvel",1978,1978,"extra","Classic live-action Hulk television series."],
 ["spiderman90","Spider-Man: The Animated Series","Animated Series","Other Marvel",1994,1994,"recommended","Beloved 1990s animated Spider-Man series."],
 ["xmen97","X-Men '97","Animated Series","X-Men",1997,2024,"essential","Continuation of the classic animated X-Men."],
@@ -53,26 +53,7 @@ const expanded = [
 ["earthmightiest","The Avengers: Earth's Mightiest Heroes","Animated Series","Other Marvel",2010,2010,"recommended","A fan-favorite Avengers animated series."],
 ["spectacular","The Spectacular Spider-Man","Animated Series","Sony Spider-Man",2008,2008,"recommended","Acclaimed animated Peter Parker series."],
 ["whatifshort","I Am Groot","Animated Series","MCU",2025,2022,"extra","Short animated Groot adventures."],
-["spideyfriends","Spidey and His Amazing Friends","Animated Series","Other Marvel",2021,2021,"extra","Preschool animated Spider-team adventures."],
-["marvelrising","Marvel Rising: Secret Warriors","Animated Special","Other Marvel",2018,2018,"extra","Animated young-hero team-up."],
-["bighero6","Big Hero 6","Movie","Other Marvel",2014,2014,"extra","Disney animation based on Marvel characters; separate continuity."],
-["menblack","Men in Black","Movie","Other Marvel",1997,1997,"extra","Based on the Malibu Comics property, later associated with Marvel."],
-["nextavengers","Next Avengers: Heroes of Tomorrow","Animated Movie","Other Marvel",2008,2008,"extra","Animated future-generation Avengers story."],
-["planet hulk","Planet Hulk","Animated Movie","Other Marvel",2010,2010,"extra","Animated adaptation of the Hulk storyline."],
-["ultimateavengers","Ultimate Avengers","Animated Movie","Other Marvel",2006,2006,"extra","Animated Avengers origin adaptation."],
-["ultimateavengers2","Ultimate Avengers 2","Animated Movie","Other Marvel",2006,2006,"extra","Animated Avengers sequel."]
-];
-catalog.push(...expanded);
-
-
-const KEY="marvelMarathonCompanionProgress";
-let watched=new Set(JSON.parse(localStorage.getItem(KEY)||"[]"));
-let currentMode="all",currentView="home";
-const $=id=>document.getElementById(id);
-const universes=["MCU","X-Men","Deadpool","Fantastic Four","Sony Spider-Man","Other Marvel"];
-const symbols={"MCU":"🛡️","X-Men":"✖️","Deadpool":"💥","Fantastic Four":"🚀","Sony Spider-Man":"🕷️","Other Marvel":"🦸"};
-function persist(){localStorage.setItem(KEY,JSON.stringify([...watched]));updateStats();renderWatchlist()}
-function updateStats(){let n=watched.size,p=Math.round(n/catalog.length*100);$("watchedCount").textContent=`${n} / ${catalog.length}`;$("percent").textContent=p+"%";$("progressPct").textContent=p+"%";$("progressFill").style.width=p+"%";$("progressText").textContent=`${n} of ${catalog.length} watched`;}
+function updateStats(){let n=watched.size,p=Math.round(n/catalog.length*100);$("progressPct").textContent=p+"%";$("progressFill").style.width=p+"%";$("progressText").textContent=`${n} of ${catalog.length} watched`;}
 function setView(v){currentView=v;document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id===v));document.querySelectorAll("[data-view]").forEach(x=>x.classList.toggle("active",x.dataset.view===v));if(v==="library")renderItems();if(v==="timeline")renderTimeline();if(v==="watchlist")renderWatchlist();if(v==="characters")renderCharacters();if(v==="teams")renderTeams();}
 document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.view)));
 document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.goto)));

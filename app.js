@@ -154,7 +154,7 @@
   }
 
   function setView(view) {
-    if (!$ (view)) return;
+    if (!$(view)) return;
     currentView = view;
     document.querySelectorAll(".view").forEach(el => el.classList.toggle("active", el.id === view));
     document.querySelectorAll("[data-view]").forEach(el => el.classList.toggle("active", el.dataset.view === view));

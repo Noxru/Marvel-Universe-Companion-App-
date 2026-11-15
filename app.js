@@ -1227,24 +1227,3 @@ console.log('MARVEL MARATHON initialized.');
 
 
 
-/* NAVIGATION */
-
-document.addEventListener('click', event => {
-  const button = event.target.closest('[data-doomsday-tab]');
-  if (!button) return;
-
-  setView('doomsday-prep');
-  renderDoomsdayPrep();
-});
-
-/* SEARCH AND SORT */
-
-$('doomsday-search')?.addEventListener(
-  'input',
-  renderDoomsdayPrep
-);
-
-$('doomsday-sort')?.addEventListener(
-  'change',
-  renderDoomsdayPrep
-

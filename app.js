@@ -1224,394 +1224,156 @@ console.log('MARVEL MARATHON initialized.');
   );
 })();
 
+
 /* =========================================================
-   MARVEL COMPANION — POSTER BROWSING UPGRADE
-   Add this block to the bottom of app.js
+   MARVEL POSTER UPGRADE — FIXED FOR EXISTING APP
+   Works with the existing .item and .poster elements
    ========================================================= */
 
-(function () {
+(() => {
   "use strict";
 
-  const posterCache = new Map();
+  const cache = new Map();
 
   const style = document.createElement("style");
   style.textContent = `
-    .marvel-poster-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
-      gap: 18px;
-      margin: 20px 0;
-    }
-
-    .marvel-poster-card {
-      background: #171717;
-      border-radius: 12px;
+    .item .poster {
+      width: 82px !important;
+      height: 118px !important;
+      min-width: 82px;
+      flex: 0 0 82px !important;
       overflow: hidden;
-      cursor: pointer;
-      transition: transform .2s ease, box-shadow .2s ease;
-      border: 1px solid #333;
+      padding: 0;
+      border-radius: 9px;
+      background: linear-gradient(145deg,#17243b,#8d172d);
+      display: grid;
+      place-items: center;
     }
 
-    .marvel-poster-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px #0008;
-    }
-
-    .marvel-poster-image {
+    .item .poster img {
       width: 100%;
-      aspect-ratio: 2 / 3;
+      height: 100%;
       object-fit: cover;
       display: block;
-      background: #252525;
     }
 
-    .marvel-poster-title {
-      padding: 10px;
-      font-weight: 700;
-      font-size: 14px;
+    .item .poster.poster-loading {
       color: white;
-    }
-
-    .marvel-poster-year {
-      padding: 0 10px 10px;
-      color: #aaa;
-      font-size: 12px;
-    }
-
-    .marvel-poster-placeholder {
-      aspect-ratio: 2 / 3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(145deg, #181818, #650000);
-      color: white;
-      font-size: 24px;
+      font-size: 17px;
       font-weight: 900;
-      text-align: center;
+      letter-spacing: 2px;
     }
 
-    .marvel-poster-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      background: rgba(0,0,0,.88);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .marvel-poster-modal.active {
-      display: flex;
-    }
-
-    .marvel-poster-modal-content {
-      background: #191919;
-      border: 1px solid #444;
-      border-radius: 16px;
-      width: min(600px, 100%);
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 22px;
-      color: white;
-    }
-
-    .marvel-poster-modal-content img {
-      width: 170px;
-      max-width: 45%;
-      border-radius: 10px;
-      float: left;
-      margin: 0 18px 15px 0;
-    }
-
-    .marvel-poster-close {
-      float: right;
-      background: #a60000;
-      border: none;
-      color: white;
-      padding: 8px 13px;
-      border-radius: 7px;
-      cursor: pointer;
-    }
-
-    .marvel-poster-action {
-      background: #b00000;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin: 5px 5px 5px 0;
-    }
-
-    @media (max-width: 480px) {
-      .marvel-poster-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
+    @media(max-width:480px) {
+      .item .poster {
+        width: 75px !important;
+        height: 108px !important;
+        min-width: 75px;
+        flex-basis: 75px !important;
       }
     }
   `;
   document.head.appendChild(style);
 
-  const modal = document.createElement("div");
-  modal.className = "marvel-poster-modal";
-  modal.innerHTML = `
-    <div class="marvel-poster-modal-content">
-      <button class="marvel-poster-close">Close ✕</button>
-      <div id="marvel-poster-modal-details"></div>
-    </div>
-  `;
-  document.body.appendChild(modal);
+  function getTitle(card) {
+    return card.querySelector(".item-title")?.textContent.trim() || "";
+  }
 
-  modal.addEventListener("click", event => {
-    if (
-      event.target === modal ||
-      event.target.classList.contains("marvel-poster-close")
-    ) {
-      modal.classList.remove("active");
-    }
-  });
+  async function findPoster(title) {
+    if (cache.has(title)) return cache.get(title);
 
-  async function getPoster(title) {
-    if (posterCache.has(title)) return posterCache.get(title);
-
-    const fallback = null;
+    let image = "";
 
     try {
-      const url =
-        "https://en.wikipedia.org/w/api.php?" +
-        new URLSearchParams({
-          action: "query",
-          generator: "search",
-          gsrsearch: title + " Marvel",
-          gsrnamespace: "0",
-          gsrlimit: "1",
-          prop: "pageimages|extracts",
-          piprop: "thumbnail",
-          pithumbsize: "500",
-          exintro: "1",
-          explaintext: "1",
-          exchars: "700",
-          format: "json",
-          origin: "*"
-        });
+      // First attempt: exact Wikipedia article.
+      const exactURL =
+        "https://en.wikipedia.org/api/rest_v1/page/summary/" +
+        encodeURIComponent(title.replaceAll(" ", "_"));
 
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Poster request failed");
+      const exactResponse = await fetch(exactURL);
 
-      const data = await response.json();
-      const page = Object.values(data.query?.pages || {})[0];
-
-      const result = page ? {
-        image: page.thumbnail?.source || fallback,
-        description: page.extract || "Marvel universe title.",
-        article: page.title || title
-      } : {
-        image: fallback,
-        description: "Marvel universe title.",
-        article: title
-      };
-
-      posterCache.set(title, result);
-      return result;
-    } catch (error) {
-      const result = {
-        image: fallback,
-        description: "Marvel universe title.",
-        article: title
-      };
-      posterCache.set(title, result);
-      return result;
-    }
-  }
-
-  function getTitle(item) {
-    if (typeof item === "string") return item;
-
-    return (
-      item.title ||
-      item.name ||
-      item.show ||
-      item.movie ||
-      item.label ||
-      "Marvel Title"
-    );
-  }
-
-  function getYear(item) {
-    if (!item || typeof item !== "object") return "";
-
-    return (
-      item.year ||
-      item.releaseYear ||
-      item.release_date ||
-      item.date ||
-      ""
-    );
-  }
-
-  function showDetails(item, poster) {
-    const title = getTitle(item);
-    const year = getYear(item);
-    const description =
-      poster.description || "Explore this Marvel universe title.";
-
-    const details = document.getElementById(
-      "marvel-poster-modal-details"
-    );
-
-    details.innerHTML = `
-      ${poster.image
-        ? `<img src="${poster.image}" alt="${title}">`
-        : `<div class="marvel-poster-placeholder"
-             style="float:left;width:170px;margin:0 18px 15px 0">
-             MARVEL
-           </div>`}
-      <h2>${escapeHTML(title)}</h2>
-      <p>${escapeHTML(String(year))}</p>
-      <p>${escapeHTML(description)}</p>
-      <div style="clear:both"></div>
-      <p>Explore this title in your Marvel Companion collection.</p>
-    `;
-
-    modal.classList.add("active");
-  }
-
-  function escapeHTML(value) {
-    return String(value).replace(/[&<>"']/g, character => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    })[character]);
-  }
-
-  async function buildPosterGrid(container, items) {
-    if (!container || !Array.isArray(items)) return;
-
-    container.classList.add("marvel-poster-grid");
-    container.innerHTML = "";
-
-    items.forEach(item => {
-      const title = getTitle(item);
-      const card = document.createElement("div");
-      card.className = "marvel-poster-card";
-
-      card.innerHTML = `
-        <div class="marvel-poster-placeholder">MARVEL</div>
-        <div class="marvel-poster-title">${escapeHTML(title)}</div>
-        <div class="marvel-poster-year">${escapeHTML(String(getYear(item)))}</div>
-      `;
-
-      container.appendChild(card);
-
-      const loadPoster = async () => {
-        const poster = await getPoster(title);
-        const placeholder = card.querySelector(
-          ".marvel-poster-placeholder"
-        );
-
-        if (poster.image && placeholder) {
-          const img = document.createElement("img");
-          img.className = "marvel-poster-image";
-          img.src = poster.image;
-          img.alt = title;
-          img.loading = "lazy";
-          placeholder.replaceWith(img);
-        }
-
-        card.onclick = () => showDetails(item, poster);
-      };
-
-      if ("IntersectionObserver" in window) {
-        const observer = new IntersectionObserver(entries => {
-          if (entries.some(entry => entry.isIntersecting)) {
-            observer.disconnect();
-            loadPoster();
-          }
-        });
-
-        observer.observe(card);
-      } else {
-        loadPoster();
+      if (exactResponse.ok) {
+        const data = await exactResponse.json();
+        image = data.thumbnail?.source || "";
       }
-    });
+
+      // Second attempt: search Wikipedia for a matching article.
+      if (!image) {
+        const searchURL =
+          "https://en.wikipedia.org/w/api.php?" +
+          new URLSearchParams({
+            action: "query",
+            generator: "search",
+            gsrsearch: title + " film",
+            gsrnamespace: "0",
+            gsrlimit: "5",
+            prop: "pageimages",
+            piprop: "thumbnail",
+            pithumbsize: "500",
+            format: "json",
+            origin: "*"
+          });
+
+        const response = await fetch(searchURL);
+
+        if (response.ok) {
+          const data = await response.json();
+          const pages = Object.values(data.query?.pages || {});
+          const match = pages.find(page => page.thumbnail?.source);
+          image = match?.thumbnail?.source || "";
+        }
+      }
+    } catch (error) {
+      console.warn("Poster unavailable:", title, error);
+    }
+
+    cache.set(title, image);
+    return image;
   }
 
-  // Upgrade existing title containers without changing their data.
-  function upgradeExistingLists() {
-    const selectors = [
-      "#items",
-      "#all-marvel-items",
-      "#mcu-only-items",
-      "#timelineItems",
-      "#doomsday-items"
-    ];
+  async function upgradeCard(card) {
+    const poster = card.querySelector(".poster");
+    const title = getTitle(card);
 
-    selectors.forEach(selector => {
-      const container = document.querySelector(selector);
-      if (!container || container.dataset.posterUpgrade === "true") return;
+    if (!poster || !title || poster.dataset.posterDone === "true") {
+      return;
+    }
 
-      const existingCards = Array.from(container.children);
-      if (!existingCards.length) return;
+    poster.dataset.posterDone = "true";
+    poster.classList.add("poster-loading");
+    poster.textContent = "MARVEL";
 
-      container.dataset.posterUpgrade = "true";
-      container.classList.add("marvel-poster-grid");
+    const imageURL = await findPoster(title);
 
-      existingCards.forEach(card => {
-        const title = card.textContent.trim();
-        if (!title) return;
+    if (!imageURL || !poster.isConnected) {
+      poster.textContent = "MARVEL";
+      return;
+    }
 
-        const posterCard = document.createElement("div");
-        posterCard.className = "marvel-poster-card";
-        posterCard.innerHTML = `
-          <div class="marvel-poster-placeholder">MARVEL</div>
-          <div class="marvel-poster-title">${escapeHTML(title)}</div>
-        `;
+    const img = document.createElement("img");
+    img.src = imageURL;
+    img.alt = title + " poster";
+    img.loading = "lazy";
 
-        container.replaceChild(posterCard, card);
+    img.onerror = () => {
+      img.remove();
+      poster.textContent = "MARVEL";
+    };
 
-        getPoster(title).then(poster => {
-          const placeholder = posterCard.querySelector(
-            ".marvel-poster-placeholder"
-          );
-
-          if (poster.image && placeholder) {
-            const img = document.createElement("img");
-            img.className = "marvel-poster-image";
-            img.src = poster.image;
-            img.alt = title;
-            img.loading = "lazy";
-            placeholder.replaceWith(img);
-          }
-
-          posterCard.onclick = () => showDetails(title, poster);
-        });
-      });
-    });
+    poster.classList.remove("poster-loading");
+    poster.replaceChildren(img);
   }
 
-  window.MarvelPosterUpgrade = {
-    getPoster,
-    buildPosterGrid,
-    showDetails,
-    refresh: upgradeExistingLists
-  };
-
-  // Wait for the original app to render its content.
-  if (document.readyState === "loading") {
-    document.addEventListener(
-      "DOMContentLoaded",
-      upgradeExistingLists
-    );
-  } else {
-    upgradeExistingLists();
+  function upgradeAllPosters() {
+    document.querySelectorAll(".item").forEach(upgradeCard);
   }
 
-  // Recheck when existing app sections are dynamically updated.
+  // Upgrade titles already displayed.
+  upgradeAllPosters();
+
+  // Upgrade titles whenever the app redraws a list.
   const observer = new MutationObserver(() => {
-    upgradeExistingLists();
+    upgradeAllPosters();
   });
 
   observer.observe(document.body, {
@@ -1619,9 +1381,10 @@ console.log('MARVEL MARATHON initialized.');
     subtree: true
   });
 
-  console.log("Marvel Poster Browsing Upgrade loaded.");
+  window.MarvelPosterUpgrade = {
+    refresh: upgradeAllPosters,
+    findPoster
+  };
+
+  console.log("Marvel poster upgrade active.");
 })();
-
-
-
-
